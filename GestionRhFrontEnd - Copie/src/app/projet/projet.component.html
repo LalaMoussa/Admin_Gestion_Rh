@@ -1,0 +1,62 @@
+<main class="main">
+    <h1>Gestion des Projets</h1>
+    <form (ngSubmit)="onSubmit()" #projetForm="ngForm">
+        <label for="nom">Nom du Projet:</label>
+        <input type="text" id="nom" name="nom" [(ngModel)]="projet.nom" required>
+
+        <label for="emplacement">Emplacement:</label>
+        <input type="text" id="emplacement" name="emplacement" [(ngModel)]="projet.emplacement" required>
+
+        <label for="dateDebut">Date de Début:</label>
+        <input type="date" id="dateDebut" name="dateDebut" [(ngModel)]="projet.dateDebut" required>
+
+        <label for="dateFin">Date de Fin:</label>
+        <input type="date" id="dateFin" name="dateFin" [(ngModel)]="projet.dateFin" required>
+
+        <label for="responsable">Responsable:</label>
+        <input type="text" id="responsable" name="responsable" [(ngModel)]="projet.responsable" required>
+
+        <label for="etat">État du Projet:</label>
+        <select id="etat" name="etat" [(ngModel)]="projet.etat" required>
+            <option value="En cours">En cours</option>
+            <option value="Terminé">Terminé</option>
+            <option value="Annulé">Annulé</option>
+        </select>
+
+        <label for="commentaire">Commentaire:</label>
+        <textarea id="commentaire" name="commentaire" [(ngModel)]="projet.commentaire"></textarea>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+
+    <h2>Liste des Projets</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Emplacement</th>
+                <th>Date de Début</th>
+                <th>Date de Fin</th>
+                <th>Responsable</th>
+                <th>État</th>
+                <th>Commentaire</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let projet of projets">
+                <td>{{ projet.nom }}</td>
+                <td>{{ projet.emplacement }}</td>
+                <td>{{ projet.dateDebut }}</td>
+                <td>{{ projet.dateFin }}</td>
+                <td>{{ projet.responsable }}</td>
+                <td>{{ projet.etat }}</td>
+                <td>{{ projet.commentaire }}</td>
+                <td>
+                    <button (click)="editProjet(projet.id)">Modifier</button>
+                    <button (click)="deleteProjet(projet.id)">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>
