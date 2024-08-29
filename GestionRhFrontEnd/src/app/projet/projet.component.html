@@ -1,0 +1,154 @@
+<!-- Notifications Toast -->
+<div *ngIf="toastMessage" [ngClass]="{'toast-success': toastType === 'success', 'toast-error': toastType === 'error'}" class="toast">
+    {{ toastMessage }}
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <div class="header">
+        <h1>Gestion des Projets</h1>
+        <button (click)="toggleForm()">{{ showForm ? 'Fermer le Formulaire' : 'Ajouter un Projet' }}</button>
+    </div>
+
+    <!-- Formulaire -->
+    <div *ngIf="showForm" class="form-container">
+        <div class="tabs">
+            <button (click)="currentTab = 'details'" [ngClass]="{'active-tab': currentTab === 'details'}">Détails</button>
+            <button (click)="currentTab = 'dates'" [ngClass]="{'active-tab': currentTab === 'dates'}">Dates</button>
+            <button (click)="currentTab = 'responsable'" [ngClass]="{'active-tab': currentTab === 'responsable'}">Responsable</button>
+            <button (click)="currentTab = 'etat'" [ngClass]="{'active-tab': currentTab === 'etat'}">État</button>
+            <button (click)="currentTab = 'commentaire'" [ngClass]="{'active-tab': currentTab === 'commentaire'}">Commentaire</button>
+            <button (click)="currentTab = 'techniciens'" [ngClass]="{'active-tab': currentTab === 'techniciens'}">Techniciens</button>
+        </div>
+
+        <div class="tab-content">
+            <!-- Détails -->
+            <div *ngIf="currentTab === 'details'" class="form-card">
+                <h2>Détails du Projet</h2>
+                <form #projetForm="ngForm" (ngSubmit)="onSubmit(projetForm)">
+                    <div class="form-group">
+                        <label for="nom">Nom du Projet:</label>
+                        <input id="nom" [(ngModel)]="projet.nom" name="nom" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="emplacement">Emplacement:</label>
+                        <input id="emplacement" [(ngModel)]="projet.emplacement" name="emplacement" required />
+                    </div>
+                </form>
+            </div>
+
+            <!-- Dates -->
+            <div *ngIf="currentTab === 'dates'" class="form-card">
+                <h2>Dates du Projet</h2>
+                <form #datesForm="ngForm" (ngSubmit)="onSubmit(datesForm)">
+                    <div class="form-group">
+                        <label for="dateDebut">Date de Début:</label>
+                        <input id="dateDebut" type="date" [(ngModel)]="projet.dateDebut" name="dateDebut" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateFin">Date de Fin:</label>
+                        <input id="dateFin" type="date" [(ngModel)]="projet.dateFin" name="dateFin" required />
+                        <div *ngIf="dateFinInvalid" class="error">La date de fin ne peut pas être inférieure à la date de début.</div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Responsable -->
+            <div *ngIf="currentTab === 'responsable'" class="form-card">
+                <h2>Responsable du Projet</h2>
+                <form #responsableForm="ngForm" (ngSubmit)="onSubmit(responsableForm)">
+                    <div class="form-group">
+                        <label for="responsable">Responsable:</label>
+                        <input id="responsable" [(ngModel)]="projet.responsable" name="responsable" required />
+                    </div>
+                </form>
+            </div>
+
+            <!-- État -->
+            <div *ngIf="currentTab === 'etat'" class="form-card">
+                <h2>État du Projet</h2>
+                <form #etatForm="ngForm" (ngSubmit)="onSubmit(etatForm)">
+                    <div class="form-group">
+                        <label for="etat">État:</label>
+                        <select id="etat" [(ngModel)]="projet.etat" name="etat" required>
+                            <option value="en cours">En cours</option>
+                            <option value="terminé">Terminé</option>
+                            <option value="annulé">Annulé</option>
+                            <option value="en attente">En attente</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Commentaire -->
+            <div *ngIf="currentTab === 'commentaire'" class="form-card">
+                <h2>Commentaire sur le Projet</h2>
+                <form #commentaireForm="ngForm" (ngSubmit)="onSubmit(commentaireForm)">
+                    <div class="form-group">
+                        <label for="commentaire">Commentaire:</label>
+                        <textarea id="commentaire" [(ngModel)]="projet.commentaire" name="commentaire"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Techniciens -->
+            <div *ngIf="currentTab === 'techniciens'" class="form-card">
+                <h2>Techniciens Associés</h2>
+                <form #techniciensForm="ngForm" (ngSubmit)="onSubmit(techniciensForm)">
+                    <div class="form-group">
+                        <label for="techniciens">Techniciens:</label>
+                        <select id="techniciens" [(ngModel)]="projet.techniciens" name="techniciens" multiple>
+                            <option *ngFor="let tech of techniciens" [ngValue]="tech">{{ tech.nom }}</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+                <!-- Champs du formulaire ici -->
+                <button type="submit" [disabled]="!isFormValid">Enregistrer</button>
+              </form>
+              
+        </div>
+    </div>
+
+    <!-- Liste des Projets -->
+    <div class="list-container">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher par nom" (input)="filterProjets($event)" />
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Emplacement</th>
+                    <th>Date de Début</th>
+                    <th>Date de Fin</th>
+                    <th>Responsable</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let projet of filteredProjets">
+                    <td>{{ projet.nom }}</td>
+                    <td>{{ projet.emplacement }}</td>
+                    <td>{{ projet.dateDebut | date }}</td>
+                    <td>{{ projet.dateFin | date }}</td>
+                    <td>{{ projet.responsable }}</td>
+                    <td>{{ projet.etat }}</td>
+                    <td>
+                        <button (click)="editProjet(projet.id)">Éditer</button>
+                        <button (click)="confirmDelete(projet.id)">Supprimer</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button (click)="goToPage(i + 1)" *ngFor="let page of [].constructor(totalPages); let i = index" [ngClass]="{'active': i + 1 === currentPage}">
+                {{ i + 1 }}
+            </button>
+        </div>
+    </div>
+</div>

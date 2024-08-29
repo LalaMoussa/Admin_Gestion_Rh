@@ -1,0 +1,83 @@
+/* Style pour la liste des projets */
+.project-list {
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Style pour le panneau des détails du projet */
+.project-details .details-card {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  background-color: #343a40;
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Style pour les informations du projet */
+.project-info div {
+  margin-bottom: 10px;
+}
+
+/* Style pour le bouton de fermeture des détails */
+.close-details {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.close-details:hover {
+  background-color: #c82333;
+}
+
+/* Style pour les événements du calendrier */
+.tache-event {
+  transition: transform 0.3s;
+}
+
+.tache-event:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* Animation d'apparition pour la carte des détails */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Style pour le calendrier */
+.full-calendar {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Styles généraux */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Style pour le conteneur du calendrier */
+.calendar-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+}
