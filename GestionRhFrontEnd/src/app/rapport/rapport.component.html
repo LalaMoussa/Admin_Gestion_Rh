@@ -10,18 +10,18 @@
 
   <div class="rapport-list">
     <ul>
-      <li *ngFor="let rapport of filteredRapports">
+      <li *ngFor="let projet of filteredProjets">
         <div class="rapport-summary">
-          <h3>{{ rapport.projet.nom }}</h3>
-          <p>Responsable : {{ rapport.projet.responsable }}</p>
-          <p>État : {{ rapport.projet.etat }}</p>
-          <button (click)="showDetails(rapport)">
-            {{ selectedRapport === rapport ? 'Cacher Détails' : 'Voir Détails' }}
+          <h3>{{ projet.nom }}</h3>
+          <p>Responsable : {{ projet.responsable }}</p>
+          <p>État : {{ projet.etat }}</p>
+          <button (click)="showDetails(projet)">
+            {{ selectedRapport === projet ? 'Cacher Détails' : 'Voir Détails' }}
           </button>
         </div>
 
         <!-- Détails du rapport -->
-        <div *ngIf="selectedRapport === rapport" class="rapport-details" [ngClass]="{'visible': selectedRapport === rapport, 'hidden': selectedRapport !== rapport}">
+        <div *ngIf="selectedRapport === projet" class="rapport-details" [ngClass]="{'visible': selectedRapport === projet, 'hidden': selectedRapport !== projet}">
           <header>
             <img src="assets/logo.png" alt="Logo de l'entreprise" class="logo" />
             <h1>Rapport de Projet</h1>
@@ -30,18 +30,18 @@
           <section class="rapport-details-content">
             <h2>Informations du Projet</h2>
             <div class="details-grid">
-              <div><strong>Nom :</strong> {{ rapport.projet.nom }}</div>
-              <div><strong>Emplacement :</strong> {{ rapport.projet.emplacement }}</div>
-              <div><strong>Date de Début :</strong> {{ rapport.projet.dateDebut | date }}</div>
-              <div><strong>Date de Fin :</strong> {{ rapport.projet.dateFin | date }}</div>
-              <div><strong>Responsable :</strong> {{ rapport.projet.responsable }}</div>
-              <div><strong>État :</strong> {{ rapport.projet.etat }}</div>
-              <div><strong>Commentaire :</strong> {{ rapport.projet.commentaire }}</div>
+              <div><strong>Nom :</strong> {{ projet.nom }}</div>
+              <div><strong>Emplacement :</strong> {{ projet.emplacement }}</div>
+              <div><strong>Date de Début :</strong> {{ projet.dateDebut | date }}</div>
+              <div><strong>Date de Fin :</strong> {{ projet.dateFin | date }}</div>
+              <div><strong>Responsable :</strong> {{ projet.responsable }}</div>
+              <div><strong>État :</strong> {{ projet.etat }}</div>
+              <div><strong>Commentaire :</strong> {{ projet.commentaire }}</div>
             </div>
 
             <h3>Techniciens Assignés</h3>
             <ul>
-              <li *ngFor="let tech of rapport.projet.techniciens">
+              <li *ngFor="let tech of projet.techniciens">
                 <p><strong>Nom :</strong> {{ tech.nom }} {{ tech.prenom }}</p>
                 <p><strong>Matricule :</strong> {{ tech.matricule }}</p>
                 <p><strong>Téléphone :</strong> {{ tech.telephone }}</p>
@@ -55,14 +55,14 @@
 
             <section class="rapport-content">
               <h2>Contenu du Rapport</h2>
-              <p>{{ rapport.contenu }}</p>
+              <p>{{ projet.contenuRapport }}</p>
             </section>
 
             <footer>
-              <p>Date de Création : {{ rapport.dateCreation | date }}</p>
-              <p>État du Rapport : {{ rapport.etat }}</p>
-              <button (click)="printReport(rapport)" class="print">Imprimer</button>
-              <button (click)="notifyReport(rapport)" class="notify">Envoyer Notification</button>
+              <p>Date de Création : {{projet.dateCreationRapport | date }}</p>
+              <p>État du Rapport : {{ projet.etat }}</p>
+              <button (click)="printReport(projet)" class="print">Imprimer</button>
+              <button (click)="notifyReport(projet)" class="notify">Envoyer Notification</button>
             </footer>
           </section>
         </div>

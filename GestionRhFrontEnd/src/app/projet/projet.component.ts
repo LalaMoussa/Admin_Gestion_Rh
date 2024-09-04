@@ -4,6 +4,9 @@ import { Projet } from '../models/projet.model';
 import { Technicien } from '../models/technicien.model';
 import { ProjetService } from '../Service/projet-service.service';
 
+import { Router } from '@angular/router';
+import { TechnicienService } from '../Service/technicien-service.service';
+
 @Component({
   selector: 'app-projet',
   templateUrl: './projet.component.html',
@@ -14,6 +17,8 @@ export class ProjetComponent implements OnInit {
   projets: Projet[] = [];
   filteredProjets: Projet[] = [];
   techniciens: Technicien[] = [];
+  filteredTechniciens: Technicien[] = [];
+  techniciensSelectionnes: Technicien[] = []; // pour ajouter les techniciens selectionner
   isEditMode: boolean = false;
   showForm: boolean = false;
   currentPage: number = 1;
@@ -23,42 +28,136 @@ export class ProjetComponent implements OnInit {
   toastType: string = '';
   searchQuery: string = '';
   currentTab: string = 'details';
+  idProjetAssign: number = 0;
   isFormValid: boolean = false;
   dateFinInvalid: boolean = false;
+  assignationEnCours: boolean = false; // Indicateur pour éviter l'ajout de produit pendant l'assignation
+  showListTechniciens: boolean = false; //Pour cacher ou montrer la section ListTech si on click sur ok 
 
-  constructor(private projetService: ProjetService) {}
+  constructor(private projetService: ProjetService,
+    private technicienService: TechnicienService,
+    private router: Router,) {}
 
   ngOnInit(): void {
     this.isFormValid = false; // Initialisation
     this.getProjets();
+    this.getTechniciens(); // Récupération des techniciens lors de l'initialisation
+  }
+
+  // Méthode pour soumettre le formulaire
+  onSubmit(form: NgForm): void {
+    if (!form.valid) {
+      this.toastMessage = 'Veuillez remplir correctement tous les champs.';
+      this.toastType = 'error';
+      this.hideToastAfterDelay();
+      return;
+    }
+    if (this.currentTab === 'dates') {
+      this.checkDateFin();
+    }
+
+    if (this.dateFinInvalid) {
+      this.toastMessage = 'La date de fin ne peut pas être inférieure à la date de début.';
+      this.toastType = 'error';
+      this.hideToastAfterDelay();
+      return;
+    }
+
+    this.saveProjet();
+    //Pour revenir a la page normal apres le save 
+    this.toggleForm();
+  }
+
+  //********  Debut pour la list des techniciens *****************////////////////
+
+    // Vérifie si un technicien est sélectionné
+    isTechnicienSelected(technicien: Technicien): boolean {
+      return this.techniciensSelectionnes.some(t => t.id === technicien.id);
+    }
+
+  // Méthodes pour gérer la liste des techniciens
+  filterTechniciens(): Technicien[] {
+    const query = this.searchQuery.toLowerCase();
+    return this.techniciens.filter(technicien =>
+      technicien.nom.toLowerCase().includes(query)
+    );
+  }
+  
+
+  confirmerSelection(): void {
+    
+    if (this.techniciensSelectionnes.length === 0) {
+      // Hide the listTechniciens section if no technicians are selected
+      this.showListTechniciens = false;
+      return;
+    }
+
+    // Assigner les techniciens sélectionnés au projet
+    this.projet.techniciens = Array.from(this.techniciensSelectionnes);
+   
+    // Mettre à jour le projet avec les techniciens sélectionnés
+    this.updateProjet(this.idProjetAssign, this.projet);
+  
+    // Réinitialiser les techniciens sélectionnés après l'assignation
+    this.techniciensSelectionnes = [];
+  
+    // Rediriger vers RapportComponent
+    this.router.navigate(['/rapport']);
+  }
+
+  toggleSelection(technicien: Technicien): void {
+    const index = this.techniciensSelectionnes.findIndex(t => t.id === technicien.id);
+    if (index === -1) {
+      this.techniciensSelectionnes.push(technicien); // Ajouter l'objet Technicien
+    } else {
+      this.techniciensSelectionnes.splice(index, 1); // Retirer l'objet Technicien
+    }
    
   }
   
 
-  onSubmit(form: NgForm): void {
-    // Validation des dates si l'onglet actif est 'dates'
-    if (this.currentTab === 'dates') {
-      this.checkDateFin(); // Validation des dates
-    }
-  
-    // Assurez-vous que form.valid est un boolean (peut-être le forcer à false si null)
-    const formValid: boolean = form.valid ?? false; // Utilisation de 'false' par défaut si form.valid est null
-  
-    this.isFormValid = formValid && !this.dateFinInvalid; // Validation globale du formulaire
-  
-    console.log('Form valid:', formValid);
-    console.log('Date fin invalid:', this.dateFinInvalid);
-    console.log('Is form valid:', this.isFormValid);
-  
-    if (this.isFormValid) {
-      this.saveProjet();
+  // Méthodes pour gérer les onglets et l'assignation
+  changeTab(tabName: string): void {
+    this.currentTab = tabName;
+  }
+
+  terminerAssignation(): void {
+    this.assignationEnCours = false;
+    this.currentTab = 'details'; // Revenir à l'onglet des détails ou autre
+  }
+
+  handleClick(projetId: number): void {
+    this.assignationEnCours = true;
+    this.idProjetAssign = projetId;
+    this.editProjetById(projetId);
+    this.changeTab('listTechniciens');
+    this.showListTechniciens = true; // Show the list of technicians
+  }
+  //********  Fin pour la list des techniciens *****************////////////////
+
+  // Méthodes pour la gestion des projets
+  checkDateFin(): void {
+    if (this.projet.dateDebut && this.projet.dateFin) {
+      this.dateFinInvalid = new Date(this.projet.dateFin) < new Date(this.projet.dateDebut);
     } else {
-      this.toastMessage = 'Veuillez remplir correctement tous les champs.';
-      this.toastType = 'error';
-      this.hideToastAfterDelay();
+      this.dateFinInvalid = false;
     }
-  }  
-  
+  }
+
+  editProjetById(id: number): void {
+    this.projetService.getProjetById(id).subscribe(
+      (projet: Projet) => {
+        this.projet = projet;
+      },
+      (error: any) => {
+        console.error('Erreur lors de la récupération du projet', error);
+        this.toastMessage = 'Erreur lors de la récupération du projet.';
+        this.toastType = 'error';
+        this.hideToastAfterDelay();
+      }
+    );
+  }
+
   saveProjet(): void {
     if (this.isEditMode) {
       this.updateProjet(this.projet.id, this.projet);
@@ -70,6 +169,7 @@ export class ProjetComponent implements OnInit {
   createProjet(): void {
     this.projetService.createProjet(this.projet).subscribe(
       (data: Projet) => {
+       
         this.projets.push(data);
         this.filteredProjets = [...this.projets];
         this.toastMessage = 'Projet créé avec succès !';
@@ -89,6 +189,8 @@ export class ProjetComponent implements OnInit {
   updateProjet(id: number, projet: Projet): void {
     this.projetService.updateProjet(id, projet).subscribe(
       (data: Projet) => {
+        console.log("Apres enrregistrement")
+        console.log(data)
         const index = this.projets.findIndex(p => p.id === data.id);
         this.projets[index] = data;
         this.filteredProjets = [...this.projets];
@@ -105,6 +207,7 @@ export class ProjetComponent implements OnInit {
       }
     );
   }
+  
 
   editProjet(id: number): void {
     this.projetService.getProjets().subscribe(
@@ -158,7 +261,27 @@ export class ProjetComponent implements OnInit {
     );
   }
 
+  // Nouvelle méthode pour récupérer les techniciens (fictifs pour l'instant)
+  getTechniciens(): void {
+    this.technicienService.getTechniciens().subscribe(
+      (techniciens: Technicien[]) => {
+        this.techniciens = techniciens;
+      },
+      error => {
+        console.error('Erreur lors de la récupération des techniciens', error);
+        this.showToast('Erreur lors de la récupération des techniciens.', 'error');
+      }
+    );
+  }
   
+  showToast(message: string, type: 'success' | 'error'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000); // Affiche le message pendant 3 secondes
+  }
 
   toggleForm(): void {
     this.showForm = !this.showForm;
@@ -173,6 +296,8 @@ export class ProjetComponent implements OnInit {
     this.isEditMode = false;
     this.searchQuery = '';
     this.dateFinInvalid = false;
+    this.assignationEnCours = false; // Réinitialiser l'état de l'assignation
+    this.techniciensSelectionnes.length = 0; // Réinitialiser les techniciens sélectionnés
   }
 
   createEmptyProjet(): Projet {
@@ -210,11 +335,13 @@ export class ProjetComponent implements OnInit {
     }, 3000);
   }
 
-  checkDateFin(): void {
-    if (this.projet.dateDebut && this.projet.dateFin) {
-      this.dateFinInvalid = new Date(this.projet.dateFin) < new Date(this.projet.dateDebut);
-    } else {
-      this.dateFinInvalid = false;
-    }
+  isFormComplete(): boolean {
+    // Vérifiez que chaque section est remplie et valide
+    const detailsValid = !!(this.projet.nom && this.projet.emplacement);
+    const datesValid = !!(this.projet.dateDebut && this.projet.dateFin && !this.dateFinInvalid);
+    const responsableValid = !!this.projet.responsable;
+  
+    // Tous les champs doivent être remplis
+    return detailsValid && datesValid && responsableValid;
   }
 }

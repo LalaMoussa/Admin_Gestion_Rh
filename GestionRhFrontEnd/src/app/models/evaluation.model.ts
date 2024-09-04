@@ -1,8 +1,8 @@
-import {Rapport} from "./rapport.model"
+import { Projet } from "./projet.model";
+import { Technicien } from "./technicien.model";
 
 export interface Evaluation {
     id: number;
-    rapport?: Rapport[];
     qualite: string;
     delai: string;
     cooperation: string;
@@ -10,6 +10,8 @@ export interface Evaluation {
     scoreTotal: number;
     dateEvaluation?: Date;
     note?: number;
+    projet?: Projet[];
+    technicien?: Technicien[];
   
   }
   

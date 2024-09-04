@@ -16,6 +16,11 @@ import { CalendrierComponent } from './calendrier/calendrier.component';
 import { PointageComponent } from './pointage/pointage.component';
 import { ProjetComponent } from './projet/projet.component';
 import { TendanceEmployesComponent } from './tendance-employes/tendance-employes.component';
+import { EvaluationComponent } from './evaluation/evaluation.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -25,7 +30,9 @@ import { TendanceEmployesComponent } from './tendance-employes/tendance-employes
     CalendrierComponent,
     PointageComponent,
     ProjetComponent,
-    TendanceEmployesComponent
+    TendanceEmployesComponent,
+    EvaluationComponent,
+    ConfirmationDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -35,9 +42,13 @@ import { TendanceEmployesComponent } from './tendance-employes/tendance-employes
     AppRoutingModule,
     RouterModule,
     NgxChartsModule, // Ajout de NgxChartsModule pour les graphiques
-    FullCalendarModule // Ajout du module FullCalendar
+    FullCalendarModule, // Ajout du module FullCalendar
+    MatButtonModule,
+    MatDialogModule
   ],
-  providers: [],
+  providers: [
+    provideAnimationsAsync()
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

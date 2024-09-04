@@ -1,14 +1,12 @@
 package com.oualanger.grhBackEnd.Technicien.model;
 
+import com.oualanger.grhBackEnd.Evaluation.Model.Evaluation;
 import com.oualanger.grhBackEnd.Projet.model.Projet;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -24,8 +22,8 @@ public class Technicien {
     private String matricule;
     private String nom;
     private String prenom;
-    private String dateRecrutement;
-    private String dateNaissance;
+    private LocalDate dateRecrutement;
+    private LocalDate dateNaissance;
     private String telephone;
     private String email;
     private String cin;
@@ -39,5 +37,13 @@ public class Technicien {
     private String fonction;
 
     @ManyToMany
+    @JoinTable(
+            name = "technicien_projet",
+            joinColumns = @JoinColumn(name = "technicien_id"),
+            inverseJoinColumns = @JoinColumn(name = "projet_id")
+    )
     private List<Projet> projets;
+
+    @OneToMany(mappedBy = "technicien")
+    private List<Evaluation> evaluations;
 }

@@ -1,6 +1,9 @@
 package com.oualanger.grhBackEnd.Evaluation.Dto;
 
 import com.oualanger.grhBackEnd.Projet.model.Projet;
+import com.oualanger.grhBackEnd.Technicien.model.Technicien;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,5 +22,6 @@ public class EvaluationDto {
     private String formation; // Changez "Formation" en "formation" pour la cohérence
 
     private Projet projetEvalue ;
+    private Technicien technicien;
 
 }

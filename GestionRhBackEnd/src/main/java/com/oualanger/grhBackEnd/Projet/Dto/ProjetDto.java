@@ -1,5 +1,6 @@
 package com.oualanger.grhBackEnd.Projet.Dto;
 
+import com.oualanger.grhBackEnd.Evaluation.Model.Evaluation;
 import com.oualanger.grhBackEnd.Technicien.model.Technicien;
 import lombok.Data;
 
@@ -18,4 +19,8 @@ public class ProjetDto {
     private String etat;
     private String commentaire;
     private List<Technicien> techniciens;
+    private List<Evaluation> evaluations;
+
+    private LocalDate dateCreationRapport;
+    private String contenuRapport;
 }

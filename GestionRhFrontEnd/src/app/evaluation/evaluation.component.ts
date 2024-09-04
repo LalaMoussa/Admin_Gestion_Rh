@@ -8,13 +8,10 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-evaluation',
   templateUrl: './evaluation.component.html',
   styleUrls: ['./evaluation.component.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule],
 })
 export class EvaluationComponent implements OnInit {
   evaluation: Evaluation = {
     id: 0,
-    rapport: [],
     qualite: 'Bien',
     delai: 'Bien',
     cooperation: 'Bien',
@@ -66,6 +63,29 @@ export class EvaluationComponent implements OnInit {
     return evaluations.slice(start, end);
   }
 
+  filterEvaluations(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const query = target.value.toLowerCase();
+    this.searchQuery = query;
+  
+    if (query) {
+      this.filteredEvaluations = this.evaluations.filter(evaluation =>
+        // Check if any technician's name contains the search query
+        evaluation.technicien && evaluation.technicien.some(tech =>
+          (tech.nom + ' ' + tech.prenom).toLowerCase().includes(query)
+        )
+      );
+    } else {
+      this.filteredEvaluations = this.evaluations;
+    }
+  
+    // Update pagination after filtering
+    this.totalPages = Math.ceil(this.filteredEvaluations.length / this.itemsPerPage);
+    this.goToPage(1); // Reset to first page
+  }
+  
+  
+
   toggleForm() {
     this.showForm = !this.showForm;
     if (!this.showForm) {
@@ -116,13 +136,13 @@ export class EvaluationComponent implements OnInit {
     return (qualiteScore + delaiScore + cooperationScore) / 3;
   }
 
-  /*editEvaluation(id: number) {
+  editEvaluation(id: number) {
     this.evaluationService.getEvaluationById(id).subscribe(evaluation => {
       this.evaluation = { ...evaluation };
       this.editMode = true;
       this.toggleForm();
     });
-  }*/
+  }
 
   confirmDelete(id: number) {
     this.toggleDeleteConfirm(id);
@@ -134,16 +154,6 @@ export class EvaluationComponent implements OnInit {
       this.loadEvaluations();
     });
     this.toggleDeleteConfirm();
-  }
-
-  filterEvaluations(event: any) {
-    const query = event.target.value.toLowerCase();
-    this.filteredEvaluations = this.paginate(
-      this.evaluations.filter(e =>
-        e.rapport && e.rapport.join(' ').toLowerCase().includes(query)
-      )
-    );
-    this.totalPages = Math.ceil(this.filteredEvaluations.length / this.itemsPerPage);
   }
   
 

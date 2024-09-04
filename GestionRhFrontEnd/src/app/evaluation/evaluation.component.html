@@ -1,16 +1,16 @@
-<!-- Notifications Toast 
+<!-- Notifications Toast  -->
 <div *ngIf="toastMessage" [ngClass]="{'toast-success': toastType === 'success', 'toast-error': toastType === 'error'}" class="toast">
     {{ toastMessage }}
   </div>
   
-  <!-- Main Container 
+  <!-- Main Container  -->
   <div class="container">
     <div class="header">
       <h1>Gestion des Evaluations</h1>
       <button (click)="toggleForm()">{{ showForm ? 'Fermer le Formulaire' : 'Ajouter une Evaluation' }}</button>
     </div>
   
-    <!-- Formulaire 
+    <!-- Formulaire  -->
     <div *ngIf="showForm" class="form-container">
       <div class="tabs">
         <button (click)="currentTab = 'infos'" [ngClass]="{'active-tab': currentTab === 'infos'}">Informations</button>
@@ -19,7 +19,7 @@
       </div>
   
       <div class="tab-content">
-        <!-- Informations 
+        <!-- Informations  -->
         <div *ngIf="currentTab === 'infos'" class="form-card">
           <h2>Informations</h2>
           <form (ngSubmit)="saveEvaluation()" #evaluationForm="ngForm">
@@ -38,15 +38,15 @@
           </form>
         </div>
   
-        <!-- Scores 
+        <!-- Scores -->
         <div *ngIf="currentTab === 'scores'" class="form-card">
           <h2>Scores</h2>
           <form (ngSubmit)="saveEvaluation()" #scoresForm="ngForm">
             <div class="form-group" *ngFor="let critere of criteres">
               <label for="{{critere}}">{{critere}}:</label>
-              <select id="{{critere}}" [(ngModel)]="evaluation[critere]" name="{{critere}}" required>
+             <!-- <select id="{{critere}}" [(ngModel)]="evaluation[critere]" name="{{critere}}" required>
                 <option *ngFor="let score of scores | keyvalue" [value]="score.key">{{score.key}}</option>
-              </select>
+              </select>-->
             </div>
             <div class="form-group" *ngIf="!isFormValid">
               <span class="error-message">Veuillez remplir tous les champs obligatoires.</span>
@@ -55,7 +55,7 @@
           </form>
         </div>
   
-        <!-- Commentaires 
+        <!-- Commentaires  -->
         <div *ngIf="currentTab === 'commentaires'" class="form-card">
           <h2>Commentaires</h2>
           <form (ngSubmit)="saveEvaluation()" #commentairesForm="ngForm">
@@ -72,7 +72,7 @@
       </div>
     </div>
   
-    <!-- Table des Evaluations 
+    <!-- Table des Evaluations -->
     <div class="evaluation-table">
       <div class="search">
         <input type="text" (input)="filterEvaluations($event)" placeholder="Rechercher par technicien" />
@@ -110,5 +110,5 @@
         <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Suivant</button>
       </div>
     </div>
-  </div>-->
+  </div>
   

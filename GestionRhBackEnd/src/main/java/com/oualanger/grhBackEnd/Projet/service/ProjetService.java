@@ -37,6 +37,26 @@ public class ProjetService {
         return projetMapper.toDTO(projetRepository.save(projet)); // Convertit le Projet sauvegardé en ProjetDto
     }
 
+    public ProjetDto updateProjet(ProjetDto projetDto) {
+        // Retrieve existing project
+        Projet existingProjet = projetRepository.findById(projetDto.getId())
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // Update fields
+        existingProjet.setNom(projetDto.getNom());
+        existingProjet.setEmplacement(projetDto.getEmplacement());
+        existingProjet.setDateDebut(projetDto.getDateDebut());
+        existingProjet.setDateFin(projetDto.getDateFin());
+        existingProjet.setResponsable(projetDto.getResponsable());
+        existingProjet.setEtat(projetDto.getEtat());
+        existingProjet.setCommentaire(projetDto.getCommentaire());
+        existingProjet.setTechniciens(projetDto.getTechniciens()); // Ensure techniciens are properly handled
+
+        // Save and return updated project
+        return projetMapper.toDTO(projetRepository.save(existingProjet));
+    }
+
+
     // Supprime un projet par son ID
     public void deleteById(Long id) {
         projetRepository.deleteById(id);

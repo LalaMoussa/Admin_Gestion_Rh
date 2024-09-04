@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { RapportService } from '../Service/rapport-service.service';
-import { Rapport } from '../models/rapport.model';
+import { Projet } from '../models/projet.model';
+import { ProjetService } from '../Service/projet-service.service';
+import { Technicien } from '../models/technicien.model';
 
 @Component({
   selector: 'app-rapport',
@@ -8,141 +9,56 @@ import { Rapport } from '../models/rapport.model';
   styleUrls: ['./rapport.component.css']
 })
 export class RapportComponent implements OnInit {
-  rapports: Rapport[] = [];
-  filteredRapports: Rapport[] = [];
-  selectedRapport: Rapport | undefined;
   searchQuery: string = '';
+  projets: Projet[] = [];
+  projetTechniciens: Projet[] = [];
+  techniciens: Technicien[] = [];
+  filteredProjets: Projet[] = [];
+  selectedRapport: Projet | undefined;
 
-  constructor(private rapportService: RapportService) { }
+
+  constructor(private projetService: ProjetService) { }
+
+  rapportContenu: string = '';
+  dateCreation: string = new Date().toISOString().split('T')[0]; // Date du jour
+  etat: string = 'en cours';
 
   ngOnInit(): void {
-    this.loadRapports();
+    this.getProjets();
     this.filterRapports(); // Initialiser filteredRapports avec la liste complète
   }
 
-  loadRapports(): void {
-    this.rapports = [
-      {
-        id: 1,
-        projet: {
-          id: 1,
-          nom: 'Développement d\'une application',
-          emplacement: 'Casablanca',
-          dateDebut: '2024-08-01',
-          dateFin: '2024-09-01',
-          responsable: 'Ahmed Ali',
-          etat: 'En cours',
-          commentaire: 'Le projet avance bien.',
-          techniciens: [
-            {
-              id: 1,
-              matricule: '12345',
-              nom: 'Khalid',
-              prenom: 'El Mansouri',
-              dateRecrutement: '2022-01-01',
-              dateNaissance: '1990-05-15',
-              telephone: '0600000000',
-              email: 'khalid@example.com',
-              cin: 'AB123456',
-              adresseRue: '123 Rue Exemple',
-              adresseVille: 'Casablanca',
-              adresseRegion: 'Grand Casablanca',
-              adresseCodePostal: '20000',
-              situationFamiliale: 'Célibataire',
-              fonction: 'Développeur',
-              projets: []
-            }
-          ],
-          taches: []
-        },
-        technicien: {
-          id: 1,
-          matricule: '12345',
-          nom: 'Khalid',
-          prenom: 'El Mansouri',
-          dateRecrutement: '2022-01-01',
-          dateNaissance: '1990-05-15',
-          telephone: '0600000000',
-          email: 'khalid@example.com',
-          cin: 'AB123456',
-          adresseRue: '123 Rue Exemple',
-          adresseVille: 'Casablanca',
-          adresseRegion: 'Grand Casablanca',
-          adresseCodePostal: '20000',
-          situationFamiliale: 'Célibataire',
-          fonction: 'Développeur',
-          projets: []
-        },
-        contenu: 'Ce rapport fournit un aperçu de l\'état d\'avancement.',
-        dateCreation: new Date().toISOString(),
-        etat: 'Finalisé'
+  getProjets(): void {
+    this.projetService.getProjets().subscribe(
+      (data: Projet[]) => {
+        this.projets = data;
+        this.filterProjetTechniciens();
       },
-      {
-        id: 2,
-        projet: {
-          id: 2,
-          nom: 'Révision de la base de données',
-          emplacement: 'Rabat',
-          dateDebut: '2024-07-01',
-          dateFin: '2024-08-01',
-          responsable: 'Sara Benali',
-          etat: 'Terminé',
-          commentaire: 'La révision a été complétée avec succès.',
-          techniciens: [
-            {
-              id: 2,
-              matricule: '67890',
-              nom: 'Amine',
-              prenom: 'Jouhari',
-              dateRecrutement: '2021-03-15',
-              dateNaissance: '1988-11-20',
-              telephone: '0700000000',
-              email: 'amine@example.com',
-              cin: 'CD654321',
-              adresseRue: '456 Rue Exemple',
-              adresseVille: 'Rabat',
-              adresseRegion: 'Rabat-Salé-Kénitra',
-              adresseCodePostal: '10000',
-              situationFamiliale: 'Marié',
-              fonction: 'Analyste',
-              projets: []
-            }
-          ],
-          taches: []
-        },
-        technicien: {
-          id: 2,
-          matricule: '67890',
-          nom: 'Amine',
-          prenom: 'Jouhari',
-          dateRecrutement: '2021-03-15',
-          dateNaissance: '1988-11-20',
-          telephone: '0700000000',
-          email: 'amine@example.com',
-          cin: 'CD654321',
-          adresseRue: '456 Rue Exemple',
-          adresseVille: 'Rabat',
-          adresseRegion: 'Rabat-Salé-Kénitra',
-          adresseCodePostal: '10000',
-          situationFamiliale: 'Marié',
-          fonction: 'Analyste',
-          projets: []
-        },
-        contenu: 'Ce rapport détaille les modifications apportées à la base de données.',
-        dateCreation: new Date().toISOString(),
-        etat: 'Finalisé'
+      (error) => {
+        console.error('Erreur lors de la récupération des projets', error);
       }
-    ];
-
-    this.filterRapports(); // Mettre à jour la liste filtrée après le chargement
+    );
   }
 
-  showDetails(rapport: Rapport): void {
-    this.selectedRapport = this.selectedRapport === rapport ? undefined : rapport;
+  showDetails(projet: Projet): void {
+    this.selectedRapport = this.selectedRapport === projet ? undefined : projet;
   }
 
-  printReport(rapport: Rapport): void {
+  filterProjetTechniciens(): void {
+    this.projetTechniciens = this.projets.filter(projet => 
+      projet.techniciens && projet.techniciens.some(tech => tech !== null)
+    );
+   
+  }
+  
+ 
+  printReport(projet: Projet): void {
+    
+     // Default values if not set
+  const dateCreationRapport = projet.dateCreationRapport || this.dateCreation;
+  const contenuRapport = projet.contenuRapport || 'Entrer un contenu';
     const printWindow = window.open('', '_blank');
+
     if (printWindow) {
       printWindow.document.open();
       printWindow.document.write(`
@@ -164,16 +80,16 @@ export class RapportComponent implements OnInit {
               </header>
               <section class="rapport-details">
                 <h2>Informations du Projet</h2>
-                <p><strong>Nom :</strong> ${rapport.projet.nom}</p>
-                <p><strong>Emplacement :</strong> ${rapport.projet.emplacement}</p>
-                <p><strong>Date de Début :</strong> ${new Date(rapport.projet.dateDebut).toLocaleDateString()}</p>
-                <p><strong>Date de Fin :</strong> ${new Date(rapport.projet.dateFin).toLocaleDateString()}</p>
-                <p><strong>Responsable :</strong> ${rapport.projet.responsable}</p>
-                <p><strong>État :</strong> ${rapport.projet.etat}</p>
-                <p><strong>Commentaire :</strong> ${rapport.projet.commentaire}</p>
+                <p><strong>Nom :</strong> ${projet.nom}</p>
+                <p><strong>Emplacement :</strong> ${projet.emplacement}</p>
+                <p><strong>Date de Début :</strong> ${new Date(projet.dateDebut).toLocaleDateString()}</p>
+                <p><strong>Date de Fin :</strong> ${new Date(projet.dateFin).toLocaleDateString()}</p>
+                <p><strong>Responsable :</strong> ${projet.responsable}</p>
+                <p><strong>État :</strong> ${projet.etat}</p>
+                <p><strong>Commentaire :</strong> ${projet.commentaire}</p>
                 <h3>Techniciens Assignés</h3>
                 <ul>
-                  ${rapport.projet.techniciens && rapport.projet.techniciens.length > 0 ? rapport.projet.techniciens.map(tech => `
+                  ${projet.techniciens && projet.techniciens.length > 0 ? projet.techniciens.map(tech => `
                     <li>
                       <p><strong>Nom :</strong> ${tech.nom} ${tech.prenom}</p>
                       <p><strong>Matricule :</strong> ${tech.matricule}</p>
@@ -189,11 +105,11 @@ export class RapportComponent implements OnInit {
               </section>
               <section class="rapport-content">
                 <h2>Contenu du Rapport</h2>
-                <p>${rapport.contenu}</p>
+                <p>${projet.contenuRapport}</p>
               </section>
               <footer>
-                <p>Date de Création : ${new Date(rapport.dateCreation).toLocaleDateString()}</p>
-                <p>État du Rapport : ${rapport.etat}</p>
+                <p>Date de Création : ${projet.dateCreationRapport}</p>
+                <p>État du Rapport : ${projet.etat}</p>
               </footer>
             </div>
           </body>
@@ -205,18 +121,18 @@ export class RapportComponent implements OnInit {
     }
   }
 
-  notifyReport(rapport: Rapport): void {
+  notifyReport(projet: Projet): void {
     if ('Notification' in window) {
       if (Notification.permission === 'granted') {
         new Notification('Nouveau Rapport', {
-          body: `Un nouveau rapport a été généré pour le projet ${rapport.projet.nom}.`,
+          body: `Un nouveau rapport a été généré pour le projet ${projet.nom}.`,
           icon: 'assets/logo.png'
         });
       } else if (Notification.permission !== 'denied') {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
             new Notification('Nouveau Rapport', {
-              body: `Un nouveau rapport a été généré pour le projet ${rapport.projet.nom}.`,
+              body: `Un nouveau rapport a été généré pour le projet ${projet.nom}.`,
               icon: 'assets/logo.png'
             });
           }
@@ -228,8 +144,8 @@ export class RapportComponent implements OnInit {
   }
 
   filterRapports(): void {
-    this.filteredRapports = this.rapports.filter(rapport =>
-      rapport.projet.nom.toLowerCase().includes(this.searchQuery.toLowerCase())
+    this.filteredProjets = this.projets.filter(projet =>
+      projet.nom.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
 }

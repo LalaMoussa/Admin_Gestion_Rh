@@ -38,12 +38,18 @@ public class ProjetController {
 
     @PutMapping("/projets/{id}")
     public ResponseEntity<ProjetDto> updateProjet(@PathVariable Long id, @RequestBody ProjetDto projetDto) {
-        if (projetService.findById(id).isPresent()) {
-            projetDto.setId(id); // Met à jour l'ID du projet
-            ProjetDto updatedProjetDto = projetService.save(projetDto);
-            return ResponseEntity.ok(updatedProjetDto); // Retourne 200 pour une mise à jour réussie
-        } else {
-            return ResponseEntity.notFound().build(); // Retourne 404 si le projet n'existe pas
+        // Ensure the DTO has the correct ID
+        projetDto.setId(id);
+
+        try {
+            // Call the service to update the project
+            ProjetDto updatedProjetDto = projetService.updateProjet(projetDto);
+
+            // Return the updated project with status 200 OK
+            return ResponseEntity.ok(updatedProjetDto);
+        } catch (RuntimeException e) {
+            // Handle the case where the project does not exist
+            return ResponseEntity.notFound().build();
         }
     }
 

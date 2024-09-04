@@ -1,6 +1,7 @@
 package com.oualanger.grhBackEnd.Evaluation.Model;
 
 import com.oualanger.grhBackEnd.Projet.model.Projet;
+import com.oualanger.grhBackEnd.Technicien.model.Technicien;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,9 +19,13 @@ public class Evaluation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "projet_id") // Nom de la colonne dans la table
-    private Projet projetEvalue; // Référence à l'entité
+    @ManyToOne
+    @JoinColumn(name = "projet_id", nullable = false)
+    private Projet projetEvalue;
+
+    @ManyToOne
+    @JoinColumn(name = "technicien_id", nullable = false)
+    private Technicien technicien;
 
     private String qualite;
     private String delai;

@@ -1,5 +1,6 @@
 package com.oualanger.grhBackEnd.Technicien.Dto;
 
+import com.oualanger.grhBackEnd.Evaluation.Model.Evaluation;
 import com.oualanger.grhBackEnd.Projet.model.Projet;
 import lombok.Data;
 
@@ -26,5 +27,7 @@ public class TechnicienDto {
     private String situationFamiliale; // Ajouté
     private String fonction; // Ajouté
     private List<Projet> projets;
+
+    private List<Evaluation> evaluations;
 
 }

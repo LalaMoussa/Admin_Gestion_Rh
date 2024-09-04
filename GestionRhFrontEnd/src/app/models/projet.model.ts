@@ -1,5 +1,6 @@
 import { Technicien } from "./technicien.model";
 import { Tache } from './tache.model';
+import { Evaluation } from "./evaluation.model";
 
 export interface Projet {
   id: number;
@@ -11,5 +12,8 @@ export interface Projet {
   etat: string;
   commentaire: string;
   techniciens?: Technicien[];
-  taches?: Tache[]; // Utilisez le modèle Tache ici
+  taches?: Tache[];
+  dateCreationRapport?: string;   // Optional field for report creation date
+  contenuRapport?: string;        // Optional field for report content
+  evaluations?: Evaluation[]; 
 }
