@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Projet } from '../models/projet.model';
 import { ProjetService } from '../Service/projet-service.service';
-import { Technicien } from '../models/technicien.model';
+import { Projet } from '../models/projet.model';
 
 @Component({
   selector: 'app-rapport',
@@ -9,30 +8,23 @@ import { Technicien } from '../models/technicien.model';
   styleUrls: ['./rapport.component.css']
 })
 export class RapportComponent implements OnInit {
-  searchQuery: string = '';
   projets: Projet[] = [];
-  projetTechniciens: Projet[] = [];
-  techniciens: Technicien[] = [];
   filteredProjets: Projet[] = [];
-  selectedRapport: Projet | undefined;
+  searchQuery: string = '';
+  selectedRapport: Projet | null = null;
 
-
-  constructor(private projetService: ProjetService) { }
-
-  rapportContenu: string = '';
-  dateCreation: string = new Date().toISOString().split('T')[0]; // Date du jour
-  etat: string = 'en cours';
+  constructor(private projetService: ProjetService) {}
 
   ngOnInit(): void {
     this.getProjets();
-    this.filterRapports(); // Initialiser filteredRapports avec la liste complète
   }
 
   getProjets(): void {
     this.projetService.getProjets().subscribe(
       (data: Projet[]) => {
+        console.log('Données récupérées:', data); // Vérifiez les données dans la console
         this.projets = data;
-        this.filterProjetTechniciens();
+        this.filterRapports();
       },
       (error) => {
         console.error('Erreur lors de la récupération des projets', error);
@@ -40,23 +32,19 @@ export class RapportComponent implements OnInit {
     );
   }
 
-  showDetails(projet: Projet): void {
-    this.selectedRapport = this.selectedRapport === projet ? undefined : projet;
+  filterRapports(): void {
+    this.filteredProjets = this.projets.filter(projet => 
+      projet.nom.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
   }
 
-  filterProjetTechniciens(): void {
-    this.projetTechniciens = this.projets.filter(projet => 
-      projet.techniciens && projet.techniciens.some(tech => tech !== null)
-    );
-   
+  showDetails(projet: Projet): void {
+    this.selectedRapport = this.selectedRapport === projet ? null : projet;
   }
-  
- 
+
   printReport(projet: Projet): void {
-    
-     // Default values if not set
-  const dateCreationRapport = projet.dateCreationRapport || this.dateCreation;
-  const contenuRapport = projet.contenuRapport || 'Entrer un contenu';
+    const dateCreationRapport = projet.dateCreationRapport || new Date();
+    const contenuRapport = projet.contenuRapport || 'Entrer un contenu';
     const printWindow = window.open('', '_blank');
 
     if (printWindow) {
@@ -93,22 +81,17 @@ export class RapportComponent implements OnInit {
                     <li>
                       <p><strong>Nom :</strong> ${tech.nom} ${tech.prenom}</p>
                       <p><strong>Matricule :</strong> ${tech.matricule}</p>
-                      <p><strong>Téléphone :</strong> ${tech.telephone}</p>
-                      <p><strong>Email :</strong> ${tech.email}</p>
-                      <p><strong>Adresse :</strong> ${tech.adresseRue}, ${tech.adresseVille}, ${tech.adresseRegion} ${tech.adresseCodePostal}</p>
-                      <p><strong>Date de Recrutement :</strong> ${new Date(tech.dateRecrutement).toLocaleDateString()}</p>
-                      <p><strong>Date de Naissance :</strong> ${new Date(tech.dateNaissance).toLocaleDateString()}</p>
-                      <p><strong>CIN :</strong> ${tech.cin}</p>
+                     
                     </li>
                   `).join('') : '<li>Aucun technicien assigné</li>'}
                 </ul>
               </section>
               <section class="rapport-content">
                 <h2>Contenu du Rapport</h2>
-                <p>${projet.contenuRapport}</p>
+                <p>${contenuRapport}</p>
               </section>
               <footer>
-                <p>Date de Création : ${projet.dateCreationRapport}</p>
+                <p>Date de Création : ${new Date(dateCreationRapport).toLocaleDateString()}</p>
                 <p>État du Rapport : ${projet.etat}</p>
               </footer>
             </div>
@@ -122,30 +105,7 @@ export class RapportComponent implements OnInit {
   }
 
   notifyReport(projet: Projet): void {
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('Nouveau Rapport', {
-          body: `Un nouveau rapport a été généré pour le projet ${projet.nom}.`,
-          icon: 'assets/logo.png'
-        });
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification('Nouveau Rapport', {
-              body: `Un nouveau rapport a été généré pour le projet ${projet.nom}.`,
-              icon: 'assets/logo.png'
-            });
-          }
-        });
-      }
-    } else {
-      alert('Les notifications ne sont pas supportées par votre navigateur.');
-    }
-  }
-
-  filterRapports(): void {
-    this.filteredProjets = this.projets.filter(projet =>
-      projet.nom.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+    // Implémentez la fonction pour envoyer une notification
+    alert('Notification envoyée pour le rapport de : ' + projet.nom);
   }
 }

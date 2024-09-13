@@ -21,9 +21,9 @@
         </div>
 
         <!-- Détails du rapport -->
-        <div *ngIf="selectedRapport === projet" class="rapport-details" [ngClass]="{'visible': selectedRapport === projet, 'hidden': selectedRapport !== projet}">
+        <div *ngIf="selectedRapport === projet" class="rapport-details">
           <header>
-            <img src="assets/logo.png" alt="Logo de l'entreprise" class="logo" />
+            <img src="assets/images/oualanger.png" class="logo" />
             <h1>Rapport de Projet</h1>
           </header>
 
@@ -40,18 +40,17 @@
             </div>
 
             <h3>Techniciens Assignés</h3>
-            <ul>
-              <li *ngFor="let tech of projet.techniciens">
-                <p><strong>Nom :</strong> {{ tech.nom }} {{ tech.prenom }}</p>
-                <p><strong>Matricule :</strong> {{ tech.matricule }}</p>
-                <p><strong>Téléphone :</strong> {{ tech.telephone }}</p>
-                <p><strong>Email :</strong> {{ tech.email }}</p>
-                <p><strong>Adresse :</strong> {{ tech.adresseRue }}, {{ tech.adresseVille }}, {{ tech.adresseRegion }} {{ tech.adresseCodePostal }}</p>
-                <p><strong>Date de Recrutement :</strong> {{ tech.dateRecrutement | date }}</p>
-                <p><strong>Date de Naissance :</strong> {{ tech.dateNaissance | date }}</p>
-                <p><strong>CIN :</strong> {{ tech.cin }}</p>
-              </li>
-            </ul>
+            <div class="techniciens-list">
+              <ul>
+                <li *ngFor="let tech of projet.techniciens" class="technicien-item">
+                  <div class="technicien-details">
+                    <p><strong>Nom :</strong> {{ tech.nom }} {{ tech.prenom }}</p>
+                    <p><strong>Matricule :</strong> {{ tech.matricule }}</p>
+                    
+                  </div>
+                </li>
+              </ul>
+            </div>
 
             <section class="rapport-content">
               <h2>Contenu du Rapport</h2>

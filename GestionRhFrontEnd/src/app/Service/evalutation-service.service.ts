@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Evaluation } from '../models/evaluation.model'; // Assurez-vous que le chemin est correct
+import { Evaluation } from '../models/evaluation.model';
 
 @Injectable({
   providedIn: 'root'

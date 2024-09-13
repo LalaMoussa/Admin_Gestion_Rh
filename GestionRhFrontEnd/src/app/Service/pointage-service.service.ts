@@ -1,3 +1,4 @@
+// pointage.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,32 +8,32 @@ import { Pointage } from '../models/pointage.model';
   providedIn: 'root'
 })
 export class PointageService {
-  private baseUrl: string = 'http://localhost:8080/api';
+  private apiUrl = 'http://localhost:8080/api'; // Assurez-vous que l'URL est correcte
 
   constructor(private http: HttpClient) { }
 
-  createPointage(pointage: Pointage): Observable<Pointage> {
-    const url = `${this.baseUrl}/pointages`;
-    return this.http.post<Pointage>(url, pointage);
-  }
-
+  // Méthode pour obtenir tous les pointages
   getPointages(): Observable<Pointage[]> {
-    const url = `${this.baseUrl}/pointages`;
-    return this.http.get<Pointage[]>(url);
+    return this.http.get<Pointage[]>(this.apiUrl);
   }
 
-  getPointageById(id: number): Observable<Pointage> {
-    const url = `${this.baseUrl}/pointages/${id}`;
-    return this.http.get<Pointage>(url);
+  // Méthode pour obtenir un pointage par ID
+  getPointage(id: number): Observable<Pointage> {
+    return this.http.get<Pointage>(`${this.apiUrl}/${id}`);
   }
 
+  // Méthode pour créer un nouveau pointage
+  createPointage(pointage: Pointage): Observable<Pointage> {
+    return this.http.post<Pointage>(this.apiUrl, pointage);
+  }
+
+  // Méthode pour mettre à jour un pointage existant
   updatePointage(id: number, pointage: Pointage): Observable<Pointage> {
-    const url = `${this.baseUrl}/pointages/${id}`;
-    return this.http.put<Pointage>(url, pointage);
+    return this.http.put<Pointage>(`${this.apiUrl}/${id}`, pointage);
   }
 
+  // Méthode pour supprimer un pointage
   deletePointage(id: number): Observable<void> {
-    const url = `${this.baseUrl}/pointages/${id}`;
-    return this.http.delete<void>(url);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

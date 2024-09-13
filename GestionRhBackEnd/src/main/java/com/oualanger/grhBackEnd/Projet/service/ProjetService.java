@@ -1,14 +1,20 @@
 package com.oualanger.grhBackEnd.Projet.service;
 
+import com.oualanger.grhBackEnd.Evaluation.Dto.EvaluationDto;
+import com.oualanger.grhBackEnd.Evaluation.Mappers.EvaluationMapper;
+import com.oualanger.grhBackEnd.Evaluation.Model.Evaluation;
 import com.oualanger.grhBackEnd.Projet.Dto.ProjetDto;
 import com.oualanger.grhBackEnd.Projet.Mappers.ProjetMapper;
 import com.oualanger.grhBackEnd.Projet.model.Projet;
 import com.oualanger.grhBackEnd.Projet.repository.ProjetRepository;
+import com.oualanger.grhBackEnd.Technicien.Mappers.TechnicienMapper;
+import com.oualanger.grhBackEnd.Technicien.model.Technicien;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjetService {
@@ -18,6 +24,12 @@ public class ProjetService {
 
     @Autowired
     private ProjetMapper projetMapper;
+
+    @Autowired
+    private TechnicienMapper technicienMapper;
+
+    @Autowired
+    private EvaluationMapper evaluationMapper;
 
     // Récupère tous les projets et les convertit en ProjetDto
     public List<ProjetDto> findAll() {
@@ -34,15 +46,20 @@ public class ProjetService {
     public ProjetDto save(ProjetDto projetDto) {
         Projet projet = projetMapper.toModel(projetDto); // Convertit ProjetDto en Projet
 
+        // Gérer les techniciens associés
+        List<Technicien> techniciens = technicienMapper.toModels(projetDto.getTechniciens());
+        projet.setTechniciens(techniciens);
+
+        // Sauvegarde du projet
         return projetMapper.toDTO(projetRepository.save(projet)); // Convertit le Projet sauvegardé en ProjetDto
     }
 
-    public ProjetDto updateProjet(ProjetDto projetDto) {
-        // Retrieve existing project
+    public ProjetDto updateProjet(Long id, ProjetDto projetDto) {
+        // Récupère le projet existant par ID
         Projet existingProjet = projetRepository.findById(projetDto.getId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        // Update fields
+        // Met à jour les champs (sauf techniciens)
         existingProjet.setNom(projetDto.getNom());
         existingProjet.setEmplacement(projetDto.getEmplacement());
         existingProjet.setDateDebut(projetDto.getDateDebut());
@@ -50,9 +67,25 @@ public class ProjetService {
         existingProjet.setResponsable(projetDto.getResponsable());
         existingProjet.setEtat(projetDto.getEtat());
         existingProjet.setCommentaire(projetDto.getCommentaire());
-        existingProjet.setTechniciens(projetDto.getTechniciens()); // Ensure techniciens are properly handled
 
-        // Save and return updated project
+        // Gérer les techniciens associés (ajouter sans écraser)
+        List<Technicien> newTechniciens = technicienMapper.toModels(projetDto.getTechniciens());
+
+        // Ajouter les nouveaux techniciens sans supprimer les existants
+        for (Technicien newTechnicien : newTechniciens) {
+            if (!existingProjet.getTechniciens().contains(newTechnicien)) {
+                existingProjet.addTechnicien(newTechnicien); // Méthode d'ajout de technicien
+            }
+        }
+
+        // Gérer les évaluations (remplacer l'ancienne liste par la nouvelle)
+        existingProjet.getEvaluations().clear();
+        for (EvaluationDto evalDto : projetDto.getEvaluations()) {
+            Evaluation evaluation = evaluationMapper.toModel(evalDto); // Convertit EvaluationDto en Evaluation
+            existingProjet.addEvaluation(evaluation);
+        }
+
+        // Sauvegarde et retourne le projet mis à jour
         return projetMapper.toDTO(projetRepository.save(existingProjet));
     }
 
@@ -60,5 +93,13 @@ public class ProjetService {
     // Supprime un projet par son ID
     public void deleteById(Long id) {
         projetRepository.deleteById(id);
+    }
+
+    // Ajouter cette méthode pour sauvegarder une liste de projets
+    public List<Projet> saveProjets(List<ProjetDto> projetDtos) {
+        List<Projet> projets = projetDtos.stream()
+                .map(projetDto -> projetMapper.toModel(projetDto))
+                .collect(Collectors.toList());
+        return projetRepository.saveAll(projets);
     }
 }

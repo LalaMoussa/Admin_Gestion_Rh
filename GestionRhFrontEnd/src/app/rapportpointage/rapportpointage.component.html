@@ -1,0 +1,52 @@
+<!-- src/app/rapportpointage/rapportpointage.component.html -->
+
+<div class="rapport-container">
+  <header>
+    <h1>Liste des Rapports de Pointage</h1>
+  </header>
+  
+  <!-- Barre de recherche -->
+  <div class="search-bar">
+    <input type="text" placeholder="Rechercher un pointage..." [(ngModel)]="searchQuery" (input)="filterRapports()" />
+  </div>
+
+  <div class="rapport-list">
+    <ul>
+      <li *ngFor="let rapport of filteredRapports">
+        <div class="rapport-summary">
+          <h3>{{ rapport.nom || 'Nom non disponible' }}</h3> <!-- Utilisez une valeur par défaut si nom est undefined -->
+          <p>Date : {{ rapport.date | date }}</p>
+          <p>Heure Début : {{ rapport.heureDebut }}</p>
+          <p>Heure Fin : {{ rapport.heureFin }}</p>
+          <button (click)="showDetails(rapport)">
+            {{ selectedRapport === rapport ? 'Cacher Détails' : 'Voir Détails' }}
+          </button>
+        </div>
+
+        <!-- Détails du rapport -->
+        <div *ngIf="selectedRapport === rapport" class="rapport-details">
+          <header>
+            <img src="assets/images/oualanger.png" class="logo" />
+            <h1>Rapport de Pointage</h1>
+          </header>
+
+          <section class="rapport-details-content">
+            <h2>Détails du Pointage</h2>
+            <div class="details-grid">
+              <div><strong>Nom :</strong> {{ rapport.nom || 'Nom non disponible' }}</div> <!-- Utilisez une valeur par défaut si nom est undefined -->
+              <div><strong>Date :</strong> {{ rapport.date | date }}</div>
+              <div><strong>Heure Début :</strong> {{ rapport.heureDebut }}</div>
+              <div><strong>Heure Fin :</strong> {{ rapport.heureFin }}</div>
+              <div><strong>Commentaire :</strong> {{ rapport.commentaire || 'Aucun commentaire' }}</div> <!-- Utilisez une valeur par défaut si commentaire est undefined -->
+            </div>
+
+            <footer>
+              <button (click)="printReport(rapport)" class="print">Imprimer</button>
+              <button (click)="notifyReport(rapport)" class="notify">Envoyer Notification</button>
+            </footer>
+          </section>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,27 +1,23 @@
 package com.oualanger.grhBackEnd.Evaluation.Dto;
 
-import com.oualanger.grhBackEnd.Projet.model.Projet;
-import com.oualanger.grhBackEnd.Technicien.model.Technicien;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.oualanger.grhBackEnd.Projet.Dto.ProjetDto;
+import com.oualanger.grhBackEnd.Technicien.Dto.TechnicienDto;
 import lombok.Data;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class EvaluationDto {
 
     private Long id;
-
-    private String qualite; // Ajouté pour correspondre aux données du formulaire
-    private String delai; // Ajouté pour correspondre aux données du formulaire
-    private String cooperation; // Ajouté pour correspondre aux données du formulaire
-    private String commentaire; // Changement en "commentaire" pour correspondre au formulaire
+    private String qualite;
+    private String delai;
+    private String cooperation;
+    private String commentaire;
     private LocalDateTime dateEvaluation;
     private int scoreTotal;
-    private String formation; // Changez "Formation" en "formation" pour la cohérence
+    private String formation;
 
-    private Projet projetEvalue ;
-    private Technicien technicien;
-
+    private List<ProjetDto> projets;
+    private TechnicienDto technicien;  // Assurez-vous d'utiliser TechnicienDto ici
 }

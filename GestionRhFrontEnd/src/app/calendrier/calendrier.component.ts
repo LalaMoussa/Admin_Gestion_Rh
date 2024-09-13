@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProjetService } from '../Service/projet-service.service';
 import { Projet } from '../models/projet.model';
-import { CalendarOptions } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import fr from '@fullcalendar/core/locales/fr'; // Importation par défaut de la locale
 
 @Component({
   selector: 'app-calendrier',
@@ -13,87 +9,54 @@ import fr from '@fullcalendar/core/locales/fr'; // Importation par défaut de la
 })
 export class CalendrierComponent implements OnInit {
   projets: Projet[] = [];
-  projetDetail?: Projet;
-  calendarOptions: CalendarOptions = {};
+  projetsAffiches: Projet[] = [];
+  joursDuMois: string[] = [];
+  mois: string = '';
+  annee: number = new Date().getFullYear();
+  moisActuel: number = new Date().getMonth();
+  selectedProjet: Projet | null = null; // Projet sélectionné
 
   constructor(private projetService: ProjetService) {}
 
   ngOnInit(): void {
-    this.projets = [
-      {
-        id: 1,
-        nom: 'Projet Alpha',
-        emplacement: 'Site A',
-        dateDebut: '2024-08-01',
-        dateFin: '2024-08-15',
-        responsable: 'Jean Dupont',
-        etat: 'En cours',
-        commentaire: 'Ce projet est en bonne voie.',
-        taches: [
-          {
-            nom: 'Tâche 1',
-            responsable: 'Jean Dupont',
-            dateDebut: '2024-08-01',
-            dateFin: '2024-08-05',
-            statut: 'En cours',
-            commentaire: 'Première tâche en cours.'
-          },
-          {
-            nom: 'Tâche 2',
-            responsable: 'Marie Curie',
-            dateDebut: '2024-08-06',
-            dateFin: '2024-08-10',
-            statut: 'Terminé',
-            commentaire: 'Deuxième tâche terminée.'
-          }
-        ]
+    this.generateCalendar(this.moisActuel, this.annee);
+    this.loadProjets();
+  }
+
+  generateCalendar(month: number, year: number): void {
+    const date = new Date(year, month, 1);
+    this.mois = date.toLocaleString('fr-FR', { month: 'long' });
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    this.joursDuMois = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
+  }
+
+  loadProjets(): void {
+    this.projetService.getProjets().subscribe(
+      (projets: Projet[]) => {
+        this.projets = projets;
+        this.filterProjets();
+      },
+      (error) => {
+        console.error('Erreur lors du chargement des projets:', error);
       }
-    ];
-
-    this.initializeCalendar();
+    );
   }
 
-  initializeCalendar(): void {
-    this.calendarOptions = {
-      initialView: 'dayGridMonth',
-      plugins: [dayGridPlugin, interactionPlugin],
-      locale: fr, // Configurer la locale en français
-      events: this.projets.flatMap(projet =>
-        projet.taches?.map(tache => ({
-          title: `${tache.nom} (${this.calculateDuration(tache.dateDebut, tache.dateFin)} jours)`,
-          start: tache.dateDebut,
-          end: tache.dateFin,
-          description: tache.commentaire,
-          color: this.getColorByStatus(tache.statut),
-          classNames: 'tache-event'
-        })) || []
-      ),
-      eventClick: this.handleEventClick.bind(this),
-      eventMouseEnter: this.handleEventMouseEnter.bind(this),
-      eventMouseLeave: this.handleEventMouseLeave.bind(this)
-    };
+  filterProjets(): void {
+    this.projetsAffiches = this.projets.filter(projet => {
+      const dateDebut = new Date(projet.dateDebut);
+      const dateFin = new Date(projet.dateFin);
+
+      return (
+        (dateDebut.getFullYear() === this.annee && dateDebut.getMonth() === this.moisActuel) ||
+        (dateFin.getFullYear() === this.annee && dateFin.getMonth() === this.moisActuel) ||
+        (dateDebut <= new Date(this.annee, this.moisActuel + 1, 0) && dateFin >= new Date(this.annee, this.moisActuel, 1))
+      );
+    });
   }
 
-  handleEventClick(arg: any): void {
-    const clickedTache = this.projets.flatMap(projet => projet.taches ?? [])
-      .find(tache => `${tache.nom} (${this.calculateDuration(tache.dateDebut, tache.dateFin)} jours)` === arg.event.title);
-    if (clickedTache) {
-      this.projetDetail = this.projets.find(projet => projet.taches?.includes(clickedTache));
-    }
-  }
-
-  handleEventMouseEnter(arg: any): void {
-    arg.el.style.borderColor = 'red';
-    arg.el.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
-  }
-
-  handleEventMouseLeave(arg: any): void {
-    arg.el.style.borderColor = '';
-    arg.el.style.boxShadow = '';
-  }
-
-  getColorByStatus(statut: string): string {
-    switch (statut) {
+  getColorForEtat(etat: string): string {
+    switch (etat) {
       case 'En cours':
         return '#ffeb3b'; // Jaune
       case 'Terminé':
@@ -103,20 +66,53 @@ export class CalendrierComponent implements OnInit {
       case 'En attente':
         return '#ff9800'; // Orange
       default:
-        return '#9e9e9e'; // Gris pour les statuts inconnus
+        return '#9e9e9e'; // Gris
     }
   }
-  
-  
 
-  calculateDuration(dateDebut: string, dateFin: string): number {
-    const startDate = new Date(dateDebut);
-    const endDate = new Date(dateFin);
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Durée en jours
+  getLeftPosition(dateDebut: string): string {
+    const debut = new Date(dateDebut).getDate();
+    const joursTotal = new Date(this.annee, this.moisActuel + 1, 0).getDate();
+    const position = (debut - 1) * (100 / joursTotal);
+    return `${position}%`;
   }
 
-  closeDetails(): void {
-    this.projetDetail = undefined;
+  getWidth(dateDebut: string, dateFin: string): string {
+    const debut = new Date(dateDebut).getDate();
+    const fin = new Date(dateFin).getDate();
+    const joursTotal = new Date(this.annee, this.moisActuel + 1, 0).getDate();
+    const largeurParJour = 100 / joursTotal;
+    const largeur = (fin - debut + 1) * largeurParJour;
+    return `${Math.min(largeur, 100)}%`;
+  }
+
+  getPreviousMonth(): void {
+    if (this.moisActuel === 0) {
+      this.moisActuel = 11;
+      this.annee--;
+    } else {
+      this.moisActuel--;
+    }
+    this.generateCalendar(this.moisActuel, this.annee);
+    this.loadProjets();
+  }
+
+  getNextMonth(): void {
+    if (this.moisActuel === 11) {
+      this.moisActuel = 0;
+      this.annee++;
+    } else {
+      this.moisActuel++;
+    }
+    this.generateCalendar(this.moisActuel, this.annee);
+    this.loadProjets();
+  }
+
+  selectProjet(projet: Projet): void {
+    this.selectedProjet = projet;
+  }
+
+  deselectProjet(): void {
+    this.selectedProjet = null;
   }
 }

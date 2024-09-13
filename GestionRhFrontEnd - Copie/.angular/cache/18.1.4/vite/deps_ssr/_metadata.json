@@ -1,0 +1,70 @@
+{
+  "hash": "f04ea9d1",
+  "configHash": "2bec0a4a",
+  "lockfileHash": "d862ff6a",
+  "browserHash": "635d8770",
+  "optimized": {
+    "@angular/common": {
+      "src": "../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "a24acd68",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "42cec025",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "827e2619",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "d7832008",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "35035142",
+      "needsInterop": false
+    },
+    "@angular/platform-server": {
+      "src": "../../../../../node_modules/@angular/platform-server/fesm2022/platform-server.mjs",
+      "file": "@angular_platform-server.js",
+      "fileHash": "124e8e11",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "95eaebe4",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-SABPKJIR": {
+      "file": "chunk-SABPKJIR.js"
+    },
+    "chunk-GVZZCRCH": {
+      "file": "chunk-GVZZCRCH.js"
+    },
+    "chunk-RMGEQVWV": {
+      "file": "chunk-RMGEQVWV.js"
+    },
+    "chunk-SDJBNQDJ": {
+      "file": "chunk-SDJBNQDJ.js"
+    },
+    "xhr2-V2GDQ3PS": {
+      "file": "xhr2-V2GDQ3PS.js"
+    },
+    "chunk-NQ4HTGF6": {
+      "file": "chunk-NQ4HTGF6.js"
+    }
+  }
+}

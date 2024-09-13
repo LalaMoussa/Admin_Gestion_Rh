@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
@@ -18,16 +19,18 @@ public class Pointage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "technicien_id")
+    private Technicien technicien;
+
+    private LocalDate date;
+
     @Column(name = "heure_debut")
     private LocalTime heureDebut;
 
     @Column(name = "heure_fin")
     private LocalTime heureFin;
 
-    @Column(name = "heure_sup")
-    private LocalTime heureSup;
-
-    @ManyToOne
-    @JoinColumn(name = "technicien_id") // Assurez-vous d'utiliser la clé étrangère correcte
-    private Technicien technicien; // Remplacez Long par Technicien
+    @Column(name = "commentaire")
+    private String commentaire;
 }

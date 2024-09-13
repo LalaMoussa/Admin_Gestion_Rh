@@ -1,5 +1,5 @@
 import { Projet } from "./projet.model";
-import { Technicien } from "./technicien.model";
+import { Technicien } from "../models/technicien.model";
 
 export interface Evaluation {
     id: number;
@@ -9,9 +9,6 @@ export interface Evaluation {
     commentaire: string;
     scoreTotal: number;
     dateEvaluation?: Date;
-    note?: number;
-    projet?: Projet[];
-    technicien?: Technicien[];
-  
-  }
-  
+    formation: string;
+    technicien?: Technicien; // Modifié ici pour correspondre au type attendu
+}

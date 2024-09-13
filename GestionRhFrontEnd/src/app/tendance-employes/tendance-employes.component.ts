@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { ProjetService } from '../Service/projet-service.service'; // Assurez-vous que le chemin est correct
+import { Projet } from '../models/projet.model'; // Assurez-vous que le chemin est correct
 
 @Component({
   selector: 'app-tendance-employes',
@@ -8,34 +10,30 @@ import { Chart, registerables } from 'chart.js';
 })
 export class TendanceEmployesComponent implements OnInit {
 
-  projets = [
-    { nom: 'Projet Alpha', dateDebut: new Date(), dateFin: new Date(new Date().setDate(new Date().getDate() + 10)), statut: 'En cours' },
-    { nom: 'Projet Beta', dateDebut: new Date(), dateFin: new Date(new Date().setDate(new Date().getDate() + 20)), statut: 'En attente' },
-    { nom: 'Projet Gamma', dateDebut: new Date(), dateFin: new Date(new Date().setDate(new Date().getDate() - 5)), statut: 'Terminé' },
-    // Ajoutez d'autres projets ici
-  ];
-
+  projets: Projet[] = []; // Initialisez le tableau de projets
+  displayedProjets: Projet[] = []; // Projets à afficher (les 3 plus proches)
   filterProjets: string = '';
   showFilterMenu: boolean = false;
 
-  constructor() { }
+  constructor(private projetService: ProjetService) { } // Injectez le service
 
   ngOnInit(): void {
     Chart.register(...registerables);
 
+    // Initialiser le graphique
     const ctx = document.getElementById('tendanceChart') as HTMLCanvasElement;
 
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jui'], // Labels en français
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jui'],
         datasets: [{
           label: 'Tendance des Employés',
           data: [10, 20, 15, 30, 25, 40],
-          borderColor: '#003366', // Bleu foncé pour la ligne
-          backgroundColor: 'rgba(0, 51, 102, 0.2)', // Bleu foncé semi-transparent pour le fond
+          borderColor: '#003366',
+          backgroundColor: 'rgba(0, 51, 102, 0.2)',
           borderWidth: 3,
-          pointBackgroundColor: '#e74c3c', // Rouge pour les points
+          pointBackgroundColor: '#e74c3c',
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           pointRadius: 6
@@ -48,13 +46,13 @@ export class TendanceEmployesComponent implements OnInit {
           title: {
             display: true,
             text: 'Tendance des Employés',
-            color: '#003366', // Bleu foncé pour le titre
+            color: '#003366',
             font: {
-              size: 22, // Taille du titre
-              weight: 'bold' // Gras
+              size: 22,
+              weight: 'bold'
             },
             padding: {
-              bottom: 20 // Espacement sous le titre
+              bottom: 20
             }
           },
           legend: {
@@ -117,6 +115,12 @@ export class TendanceEmployesComponent implements OnInit {
         }
       }
     });
+
+    // Récupérer les projets réels
+    this.projetService.getProjets().subscribe(data => {
+      this.projets = data;
+      this.updateDisplayedProjets();
+    });
   }
 
   toggleFilterMenu(): void {
@@ -125,33 +129,44 @@ export class TendanceEmployesComponent implements OnInit {
 
   setFilter(status: string): void {
     this.filterProjets = status;
-    this.showFilterMenu = false; // Fermer le menu après sélection
+    this.showFilterMenu = false;
+    this.updateDisplayedProjets();
   }
 
-  getStatusColor(statut: string): string {
-    switch (statut) {
+  getStatusColor(etat: string): string {
+    switch (etat) {
       case 'En cours':
         return '#ffeb3b'; // Jaune
-      case 'En attente':
-        return '#ff9800'; // Orange
       case 'Terminé':
         return '#8bc34a'; // Vert
       case 'Annulé':
         return '#f44336'; // Rouge
+      case 'En attente':
+        return '#ff9800'; // Orange
       default:
-        return '#9e9e9e'; // Gris pour les statuts inconnus
+        return '#9e9e9e'; // Gris
     }
   }
 
-  filterProjetList(): any[] {
+  updateDisplayedProjets(): void {
+    let filtered = this.filterProjetList();
+
+    // Trier les projets par nombre de jours restants
+    filtered.sort((a, b) => this.getDaysRemaining(a.dateFin) - this.getDaysRemaining(b.dateFin));
+
+    // Prendre les 3 projets les plus proches
+    this.displayedProjets = filtered.slice(0, 3);
+  }
+
+  filterProjetList(): Projet[] {
     if (!this.filterProjets) {
       return this.projets;
     }
 
-    return this.projets.filter(projet => projet.statut.toLowerCase().includes(this.filterProjets.toLowerCase()));
+    return this.projets.filter(projet => projet.etat.toLowerCase().includes(this.filterProjets.toLowerCase()));
   }
 
-  getDaysRemaining(dateFin: Date): number {
+  getDaysRemaining(dateFin: string): number {
     const endDate = new Date(dateFin);
     const today = new Date();
     const timeDiff = endDate.getTime() - today.getTime();

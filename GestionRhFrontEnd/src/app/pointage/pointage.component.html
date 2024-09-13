@@ -13,19 +13,30 @@
     <!-- Formulaire -->
     <div *ngIf="showForm" class="form-container">
         <div class="tabs">
-            <button (click)="currentTab = 'infos'" [ngClass]="{'active-tab': currentTab === 'infos'}">Informations</button>
-            <button (click)="currentTab = 'horaires'" [ngClass]="{'active-tab': currentTab === 'horaires'}">Horaires</button>
-            <button (click)="currentTab = 'commentaire'" [ngClass]="{'active-tab': currentTab === 'commentaire'}">Commentaire</button>
+            <button (click)="changeTab('infos')" [ngClass]="{'active-tab': currentTab === 'infos'}">Informations</button>
+            <button (click)="changeTab('horaires')" [ngClass]="{'active-tab': currentTab === 'horaires'}">Horaires</button>
+            <button (click)="changeTab('commentaire')" [ngClass]="{'active-tab': currentTab === 'commentaire'}">Commentaire</button>
         </div>
 
         <div class="tab-content">
             <!-- Informations -->
             <div *ngIf="currentTab === 'infos'" class="form-card">
                 <h2>Informations sur le Pointage</h2>
-                <form (ngSubmit)="savePointage()" #pointageForm="ngForm">
+                <form (ngSubmit)="onSubmit()">
                     <div class="form-group">
-                        <label for="nom">Nom du Pointage:</label>
-                        <input id="nom" [(ngModel)]="pointage.nom" name="nom" required />
+                        <label for="technicien">Technicien:</label>
+                        <ng-select
+                            id="technicien"
+                            [items]="techniciens"
+                            bindLabel="nom"
+                            bindValue="id"
+                            [(ngModel)]="pointage.technicien"
+                            name="technicien"
+                            placeholder="Sélectionner un technicien"
+                            [searchable]="true"
+                            [clearable]="true"
+                            [virtualScroll]="true">
+                        </ng-select>
                     </div>
                     <div class="form-group">
                         <label for="date">Date:</label>
@@ -37,7 +48,7 @@
             <!-- Horaires -->
             <div *ngIf="currentTab === 'horaires'" class="form-card">
                 <h2>Horaires</h2>
-                <form (ngSubmit)="savePointage()" #horairesForm="ngForm">
+                <form (ngSubmit)="onSubmit()">
                     <div class="form-group">
                         <label for="heureDebut">Heure de Début:</label>
                         <input id="heureDebut" type="time" [(ngModel)]="pointage.heureDebut" name="heureDebut" required />
@@ -52,7 +63,7 @@
             <!-- Commentaire -->
             <div *ngIf="currentTab === 'commentaire'" class="form-card">
                 <h2>Commentaire</h2>
-                <form (ngSubmit)="savePointage()" #commentaireForm="ngForm">
+                <form (ngSubmit)="onSubmit()">
                     <div class="form-group">
                         <label for="commentaire">Commentaire:</label>
                         <textarea id="commentaire" [(ngModel)]="pointage.commentaire" name="commentaire"></textarea>
@@ -60,18 +71,19 @@
                 </form>
             </div>
 
-            <button (click)="savePointage()" [disabled]="!isFormValid">Enregistrer</button>
+            <!-- Bouton d'enregistrement -->
+            <button (click)="onSubmit()">Enregistrer</button>
         </div>
     </div>
 
     <!-- Liste des Pointages -->
     <div class="list-container">
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher par nom" (input)="filterPointages($event)" />
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher par technicien" (input)="filterPointages()" />
         
         <table>
             <thead>
                 <tr>
-                    <th>Nom</th>
+                    <th>Technicien</th>
                     <th>Date</th>
                     <th>Heure de Début</th>
                     <th>Heure de Fin</th>
@@ -81,13 +93,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let pointage of filteredPointages">
-                    <td>{{ pointage.nom }}</td>
+                <tr *ngFor="let pointage of pagedPointages">
+                    <td>{{ pointage.technicien ? pointage.technicien.nom : 'Technicien non attribué' }}</td>
                     <td>{{ pointage.date | date }}</td>
                     <td>{{ pointage.heureDebut }}</td>
                     <td>{{ pointage.heureFin }}</td>
-                    <td>{{ calculateHoursWorked(pointage) | number:'1.1-2' }}</td>
-                    <td>{{ calculateOvertimeHours(pointage) | number:'1.1-2' }}</td>
+                    <td>{{ calculateHoursWorked(pointage) | number:'1.2-2' }}</td>
+                    <td>{{ calculateOvertimeHours(pointage) | number:'1.2-2' }}</td>
                     <td>
                         <button (click)="editPointage(pointage.id)">Éditer</button>
                         <button (click)="confirmDelete(pointage.id)">Supprimer</button>

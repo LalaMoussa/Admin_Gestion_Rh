@@ -1,16 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { PointageServiceService } from './pointage-service.service';
+@Injectable({
+  providedIn: 'root'
+})
+export class EvaluationService {
+  private apiUrl = 'http://localhost:8080/api';
 
-describe('PointageServiceService', () => {
-  let service: PointageServiceService;
+  constructor(private http: HttpClient) {}
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(PointageServiceService);
-  });
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-});
+  submitEvaluation(evaluation: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, evaluation);
+  }
+}

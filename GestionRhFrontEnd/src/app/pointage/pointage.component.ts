@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Pointage } from '../models/pointage.model'; // Assurez-vous que ce modèle est défini correctement dans votre projet
-import { PointageService } from '../Service/pointage-service.service'; // Assurez-vous que ce service est défini et injecté correctement
+import { PointageService } from '../Service/pointage-service.service';
+import { TechnicienService } from '../Service/technicien-service.service';
+import { Pointage } from '../models/pointage.model';
+import { Technicien } from '../models/technicien.model';
 
 @Component({
   selector: 'app-pointage',
@@ -9,181 +10,69 @@ import { PointageService } from '../Service/pointage-service.service'; // Assure
   styleUrls: ['./pointage.component.css']
 })
 export class PointageComponent implements OnInit {
-  pointage: Pointage = this.createEmptyPointage();
   pointages: Pointage[] = [];
   filteredPointages: Pointage[] = [];
-  isEditMode: boolean = false;
-  showForm: boolean = false;
+  pagedPointages: Pointage[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 10;
-  totalPages: number = 1;
-  toastMessage: string = '';
-  toastType: string = '';
+  totalPages: number = 0;
   searchQuery: string = '';
-  currentTab: string = 'infos'; 
-  isFormValid: boolean = false;
+  showForm: boolean = false;
+  currentTab: string = 'infos';
+  toastMessage: string | null = null;
+  toastType: string | null = null;
+  pointage: Pointage = {
+    id: 0,
+    technicien: null,
+    date: '',
+    heureDebut: '',
+    heureFin: '',
+    commentaire: ''
+  };
+  techniciens: Technicien[] = [];
+  searchTechnicien: string = '';
+  filteredTechniciens: Technicien[] = [];
 
-  constructor(private pointageService: PointageService) {}
+  constructor(
+    private pointageService: PointageService,
+    private technicienService: TechnicienService
+  ) { }
 
-  ngOnInit(): void {
-    this.getPointages();
+  ngOnInit(): void { 
+    this.loadPointages();
+    this.loadTechniciens();
   }
 
-  onSubmit(pointageForm: NgForm): void {
-    this.isFormValid = pointageForm.valid ?? false;
-    if (this.isFormValid) {
-      this.savePointage(); 
-    } else {
-      this.toastMessage = 'Veuillez remplir correctement tous les champs.';
-      this.toastType = 'error';
-      this.hideToastAfterDelay();
-    }
+  loadPointages(): void {
+    this.pointageService.getPointages().subscribe((data: Pointage[]) => {
+      this.pointages = data;
+      this.filteredPointages = data;
+      this.updatePagination();
+    }, error => {
+      console.error('Erreur lors du chargement des pointages:', error);
+    });
   }
 
-  savePointage(): void {
-    if (this.isEditMode) {
-      this.updatePointage();
-    } else {
-      this.createPointage();
-    }
-  }
-
-  createPointage(): void {
-    this.pointageService.createPointage(this.pointage).subscribe(
-      (response: Pointage) => {
-        this.toastMessage = 'Pointage créé avec succès';
-        this.toastType = 'success';
-        this.pointages.push(response);
-        this.filteredPointages.push(response);
-        this.updatePagination();
-        this.resetForm();
-      },
-      (error) => {
-        this.toastMessage = 'Erreur lors de la création du pointage';
-        this.toastType = 'error';
-        this.hideToastAfterDelay();
-      }
-    );
-  }
-
-  updatePointage(): void {
-    this.pointageService.updatePointage(this.pointage.id, this.pointage).subscribe(
-      (response: Pointage) => {
-        const index = this.pointages.findIndex(p => p.id === this.pointage.id);
-        if (index !== -1) {
-          this.pointages[index] = response;
-          this.filteredPointages[index] = response;
-          this.updatePagination();
-        }
-        this.toastMessage = 'Pointage mis à jour avec succès';
-        this.toastType = 'success';
-        this.resetForm();
-      },
-      (error) => {
-        this.toastMessage = 'Erreur lors de la mise à jour du pointage';
-        this.toastType = 'error';
-        this.hideToastAfterDelay();
-      }
-    );
-  }
-
-  editPointage(id: number): void {
-    this.pointageService.getPointageById(id).subscribe(
-      (response: Pointage) => {
-        this.pointage = response;
-        this.isEditMode = true;
-        this.showForm = true;
-      },
-      (error) => {
-        this.toastMessage = 'Erreur lors de la récupération du pointage';
-        this.toastType = 'error';
-        this.hideToastAfterDelay();
-      }
-    );
-  }
-
-  confirmDelete(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce pointage ?')) {
-      this.deletePointage(id);
-    }
-  }
-
-  deletePointage(id: number): void {
-    this.pointageService.deletePointage(id).subscribe(
-      () => {
-        this.pointages = this.pointages.filter(p => p.id !== id);
-        this.filteredPointages = this.filteredPointages.filter(p => p.id !== id);
-        this.updatePagination();
-        this.toastMessage = 'Pointage supprimé avec succès';
-        this.toastType = 'success';
-        this.hideToastAfterDelay();
-      },
-      (error) => {
-        this.toastMessage = 'Erreur lors de la suppression du pointage';
-        this.toastType = 'error';
-        this.hideToastAfterDelay();
-      }
-    );
-  }
-
-  getPointages(): void {
-    this.pointageService.getPointages().subscribe(
-      (response: Pointage[]) => {
-        this.pointages = response;
-        this.filteredPointages = response;
-        this.updatePagination();
-      },
-      (error) => {
-        this.toastMessage = 'Erreur lors de la récupération des pointages';
-        this.toastType = 'error';
-        this.hideToastAfterDelay();
-      }
-    );
-  }
-
-  filterPointages(event: Event): void {
-    this.searchQuery = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredPointages = this.pointages.filter(p => p.nom.toLowerCase().includes(this.searchQuery));
-    this.updatePagination();
+  loadTechniciens(): void {
+    this.technicienService.getTechniciens().subscribe((data: Technicien[]) => {
+      this.techniciens = data;
+      this.filteredTechniciens = data;
+    }, error => {
+      console.error('Erreur lors du chargement des techniciens:', error);
+    });
   }
 
   toggleForm(): void {
     this.showForm = !this.showForm;
     if (!this.showForm) {
-      this.resetForm();
+      this.resetPointageForm();
     }
   }
 
-  resetForm(): void {
-    this.pointage = this.createEmptyPointage();
-    this.isEditMode = false;
-    this.isFormValid = false;
-  }
-
-  hideToastAfterDelay(): void {
-    setTimeout(() => {
-      this.toastMessage = '';
-    }, 3000);
-  }
-
-  goToPage(page: number): void {
-    if (page > 0 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
-    }
-  }
-
-  updatePagination(): void {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.filteredPointages = this.pointages.slice(start, end);
-    this.totalPages = Math.ceil(this.pointages.length / this.itemsPerPage);
-  }
-
-  createEmptyPointage(): Pointage {
-    return {
+  resetPointageForm(): void {
+    this.pointage = {
       id: 0,
-      nom: '',
+      technicien: null,
       date: '',
       heureDebut: '',
       heureFin: '',
@@ -191,30 +80,110 @@ export class PointageComponent implements OnInit {
     };
   }
 
-  calculateHoursWorked(pointage: Pointage): number {
-    if (pointage.heureDebut && pointage.heureFin) {
-      const start = new Date(`1970-01-01T${pointage.heureDebut}:00`);
-      const end = new Date(`1970-01-01T${pointage.heureFin}:00`);
-      const diffInMs = end.getTime() - start.getTime();
-      return diffInMs / (1000 * 60 * 60); // Convert milliseconds to hours
+  changeTab(tabName: string): void {
+    this.currentTab = tabName;
+  }
+
+  onSubmit(): void {
+    if (this.pointage.id !== 0) {
+      this.pointageService.updatePointage(this.pointage.id, this.pointage).subscribe(() => {
+        this.showToast('Pointage mis à jour avec succès', 'success');
+        this.loadPointages();
+        this.toggleForm();
+      }, error => {
+        console.error('Erreur lors de la mise à jour du pointage:', error);
+      });
+    } else {
+      this.pointageService.createPointage(this.pointage).subscribe(() => {
+        this.showToast('Pointage ajouté avec succès', 'success');
+        this.loadPointages();
+        this.toggleForm();
+      }, error => {
+        console.error('Erreur lors de l\'ajout du pointage:', error);
+      });
     }
-    return 0;
+  }
+
+  editPointage(id: number): void {
+    this.pointageService.getPointage(id).subscribe((data: Pointage) => {
+      this.pointage = data;
+      this.showForm = true;
+    }, error => {
+      console.error('Erreur lors de la récupération du pointage:', error);
+    });
+  }
+  
+
+  confirmDelete(id: number): void {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce pointage ?')) {
+      this.pointageService.deletePointage(id).subscribe(() => {
+        this.showToast('Pointage supprimé avec succès', 'success');
+        this.loadPointages();
+      }, error => {
+        console.error('Erreur lors de la suppression du pointage:', error);
+      });
+    }
+  }
+
+  calculateHoursWorked(pointage: Pointage): number {
+    const start = new Date(`1970-01-01T${pointage.heureDebut}`);
+    const end = new Date(`1970-01-01T${pointage.heureFin}`);
+    const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+    return diff;
   }
 
   calculateOvertimeHours(pointage: Pointage): number {
-    if (pointage.heureDebut && pointage.heureFin) {
-      const start = new Date(`1970-01-01T${pointage.heureDebut}`);
-      const end = new Date(`1970-01-01T${pointage.heureFin}`);
-      const hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-      
-      // Suppose you consider overtime if hours worked exceed 8 hours
-      const regularHours = 8;
-      return hoursWorked > regularHours ? hoursWorked - regularHours : 0;
-    }
-    return 0;
+    const hoursWorked = this.calculateHoursWorked(pointage);
+    return Math.max(0, hoursWorked - 8);
   }
 
-  changeTab(tab: string): void {
-    this.currentTab = tab;
+  showToast(message: string, type: string): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    setTimeout(() => {
+      this.toastMessage = null;
+      this.toastType = null;
+    }, 3000);
+  }
+
+  filterPointages(): void {
+    if (this.searchQuery.trim() === '') {
+      this.filteredPointages = this.pointages;
+    } else {
+      this.filteredPointages = this.pointages.filter(pointage =>
+        (pointage.technicien?.nom + ' ' + pointage.technicien?.prenom).toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    }
+    this.updatePagination();
+  }
+
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredPointages.length / this.itemsPerPage);
+    this.pagedPointages = this.filteredPointages.slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  filterTechniciens(): void {
+    if (this.searchTechnicien.trim() === '') {
+      this.filteredTechniciens = this.techniciens;
+    } else {
+      this.filteredTechniciens = this.techniciens.filter(technicien =>
+        (technicien.nom + ' ' + technicien.prenom).toLowerCase().includes(this.searchTechnicien.toLowerCase())
+      );
+    }
+  }
+
+  getTechnicienName(technicienId: number | null | undefined): string {
+    if (technicienId === undefined || technicienId === null) {
+        return 'Technicien non attribué';
+    }
+    const technicien = this.techniciens.find(t => t.id === technicienId);
+    return technicien ? technicien.nom : 'Technicien introuvable';
   }
 }

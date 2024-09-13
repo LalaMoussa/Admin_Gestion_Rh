@@ -1,7 +1,7 @@
 <!-- SIDEBAR -->
 <section id="sidebar" [ngClass]="status ? 'hide' : ''">
   <a href="/">
-    <img src="assets/images/oualanger.png" alt="Logo" style="width: 150px; height: auto; margin: 20px auto; display: block;">
+    <img src="assets/images/oualanger.png" alt="Logo" style="width: 70px; height: auto; margin: 2px auto; display: block;">
   </a>
   <ul class="side-menu top">
     <li>
@@ -16,16 +16,14 @@
         <span class="text">Technicien</span>
       </a>
     </li>
+    <li><a routerLink="/projet" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <i class='bx bxs-folder'></i> <!-- Utilisé ici pour "Projet" -->
+      <span class="text">Projet</span>
+    </a></li>
     <li>
       <a routerLink="/rapport" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <i class='bx bxs-file-blank'></i> <!-- Utilisé ici pour "Assignation du Technicien" -->
-        <span class="text">Assignation du Technicien</span>
-      </a>
-    </li>
-    <li>
-      <a routerLink="/projet" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <i class='bx bxs-folder'></i> <!-- Utilisé ici pour "Projet" -->
-        <span class="text">Projet</span>
+        <span class="text">Rapport des projets</span>
       </a>
     </li>
     <li>
@@ -38,6 +36,12 @@
       <a routerLink="/pointage" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <i class='bx bxs-time'></i> <!-- Utilisé ici pour "Pointage" -->
         <span class="text">Pointage</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/rapportpointage" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class='bx bxs-file-blank'></i> <!-- Utilisé ici pour "Assignation du Technicien" -->
+        <span class="text">Rapport des pointages</span>
       </a>
     </li>
     <li>

@@ -1,9 +1,9 @@
 /* Conteneur principal du rapport */
 .rapport-container {
-    width: 80%;
+    width: 90%;
     margin: auto;
     padding: 20px;
-    background-color: #ffffff; /* Fond blanc pour une apparence plus lumineuse */
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -55,10 +55,9 @@ h1 {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 20px;
-    background-color: #f9f9f9; /* Fond gris clair pour une meilleure lisibilité */
+    background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    margin-bottom: 20px; /* Ajouter de l'espace sous chaque rapport */
+    margin-bottom: 20px;
     animation: fadeIn 1s ease-in;
 }
 
@@ -71,7 +70,7 @@ h1 {
 }
 
 .rapport-details.visible {
-    max-height: 1000px; /* Ajuster selon le contenu */
+    max-height: 1000px;
     opacity: 1;
     transition: max-height 0.3s ease, opacity 0.3s ease;
 }
@@ -96,6 +95,24 @@ h1 {
     animation: fadeIn 1s ease-in;
 }
 
+.techniciens-list {
+    margin-top: 10px;
+}
+
+.technicien-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.technicien-details p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #333;
+}
+
 /* Contenu du rapport */
 .rapport-content h2 {
     font-size: 20px;
@@ -109,7 +126,7 @@ h1 {
 /* Texte des sections */
 p {
     font-size: 16px;
-    color: #333; /* Couleur de texte plus foncée pour une meilleure lisibilité */
+    color: #333;
     line-height: 1.6;
     margin: 10px 0;
     animation: fadeIn 1s ease-in;
@@ -132,13 +149,33 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin: 10px 5px; /* Espacement entre les boutons */
+    margin: 10px 5px;
     transition: background-color 0.3s ease;
     animation: fadeIn 1s ease-in;
 }
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Bouton Imprimer */
+button.print {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+button.print:hover {
+    background-color: #e0a800;
+}
+
+/* Bouton Envoyer Notification */
+button.notify {
+    background-color: #28a745;
+    color: #fff;
+}
+
+button.notify:hover {
+    background-color: #218838;
 }
 
 /* Animations */
@@ -151,23 +188,4 @@ button:hover {
         opacity: 1;
         transform: translateY(0);
     }
-}
-/* Bouton Imprimer */
-button.print {
-    background-color: #ffc107; /* Jaune */
-    color: #fff;
-}
-
-button.print:hover {
-    background-color: #e0a800; /* Jaune foncé au survol */
-}
-
-/* Bouton Envoyer Notification */
-button.notify {
-    background-color: #28a745; /* Vert */
-    color: #fff;
-}
-
-button.notify:hover {
-    background-color: #218838; /* Vert foncé au survol */
 }

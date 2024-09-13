@@ -1,7 +1,6 @@
 package com.oualanger.grhBackEnd.Pointage.Controller;
 
 import com.oualanger.grhBackEnd.Pointage.Dto.PointageDto;
-import com.oualanger.grhBackEnd.Pointage.Dto.PointageDto;
 import com.oualanger.grhBackEnd.Pointage.Service.PointageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pointages")
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:4200") // Assurez-vous que l'origine correspond à votre application Angular
 public class PointageController {
 
     @Autowired

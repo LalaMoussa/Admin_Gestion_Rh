@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EvaluationService } from '../Service/evalutation-service.service';
 import { Evaluation } from '../models/evaluation.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Technicien } from '../models/technicien.model'; // Importer le modèle Technicien
 
 @Component({
   selector: 'app-evaluation',
@@ -12,13 +11,30 @@ import { FormsModule } from '@angular/forms';
 export class EvaluationComponent implements OnInit {
   evaluation: Evaluation = {
     id: 0,
+    technicien: { 
+      id: 0,
+      matricule: '',
+      nom: '',
+      prenom: '',
+      dateRecrutement: '',
+      dateNaissance: '',
+      telephone: '',
+      email: '',
+      cin: '',
+      adresseRue: '',
+      adresseVille: '',
+      adresseRegion: '',
+      adresseCodePostal: '',
+      situationFamiliale: '',
+      fonction: ''
+    },
     qualite: 'Bien',
     delai: 'Bien',
     cooperation: 'Bien',
+    formation:'Pas de formation',
     commentaire: '',
     scoreTotal: 0
   };
-
 
   evaluations: Evaluation[] = [];
   filteredEvaluations: Evaluation[] = [];
@@ -35,7 +51,7 @@ export class EvaluationComponent implements OnInit {
   isFormValid: boolean = true;
   currentTab: string = 'infos'; // Ajout de la propriété 'currentTab'
 
-  criteres: string[] = ['qualite', 'delai', 'cooperation']; // Définir les critères utilisés dans le formulaire
+  criteres: Array<keyof Evaluation> = ['qualite', 'delai', 'cooperation']; // Utiliser les clés d'Evaluation
   scores: Record<string, number> = {
     'À améliorer': 1,
     'Assez bien': 2,
@@ -51,12 +67,32 @@ export class EvaluationComponent implements OnInit {
 
   loadEvaluations() {
     this.evaluationService.getEvaluations().subscribe(evaluations => {
-      this.evaluations = evaluations;
-      this.filteredEvaluations = this.paginate(evaluations);
+      this.evaluations = evaluations.map(evaluation => ({
+        ...evaluation,
+        technicien: evaluation.technicien || {
+          id: 0,
+          matricule: '',
+          nom: '',
+          prenom: '',
+          dateRecrutement: '',
+          dateNaissance: '',
+          telephone: '',
+          email: '',
+          cin: '',
+          adresseRue: '',
+          adresseVille: '',
+          adresseRegion: '',
+          adresseCodePostal: '',
+          situationFamiliale: '',
+          fonction: ''
+        }
+      }));
+      
+      this.filteredEvaluations = this.paginate(this.evaluations);
       this.totalPages = Math.ceil(this.evaluations.length / this.itemsPerPage);
     });
   }
-
+  
   paginate(evaluations: Evaluation[]): Evaluation[] {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
@@ -70,20 +106,17 @@ export class EvaluationComponent implements OnInit {
   
     if (query) {
       this.filteredEvaluations = this.evaluations.filter(evaluation =>
-        // Check if any technician's name contains the search query
-        evaluation.technicien && evaluation.technicien.some(tech =>
-          (tech.nom + ' ' + tech.prenom).toLowerCase().includes(query)
-        )
+        evaluation.technicien && // Check if technicien exists
+        (evaluation.technicien.nom.toLowerCase().includes(query) || 
+        evaluation.technicien.prenom.toLowerCase().includes(query))
       );
     } else {
       this.filteredEvaluations = this.evaluations;
     }
   
-    // Update pagination after filtering
     this.totalPages = Math.ceil(this.filteredEvaluations.length / this.itemsPerPage);
-    this.goToPage(1); // Reset to first page
+    this.goToPage(1);
   }
-  
   
 
   toggleForm() {
@@ -100,48 +133,41 @@ export class EvaluationComponent implements OnInit {
   }
 
   saveEvaluation() {
+    // Calculate the total score for the evaluation
     const scoreTotal = this.calculateScore(this.evaluation);
-
+  
+    // Check if in edit mode (editing an existing evaluation)
     if (this.editMode) {
-      this.evaluationService.updateEvaluation(this.evaluation.id, { ...this.evaluation, scoreTotal }).subscribe(() => {
-        this.showToast('Évaluation mise à jour avec succès !', 'success');
-        this.loadEvaluations();
-      });
+      // Update the existing evaluation
+      this.evaluationService.updateEvaluation(this.evaluation.id, { ...this.evaluation, scoreTotal })
+        .subscribe(() => {
+          this.showToast('Évaluation mise à jour avec succès !', 'success'); // Show success message
+          this.loadEvaluations(); // Reload evaluations list
+        }, () => {
+          this.showToast('Erreur lors de la mise à jour de l\'évaluation', 'error'); // Show error message
+        });
     } else {
-      this.evaluationService.createEvaluation({ ...this.evaluation, scoreTotal }).subscribe(() => {
-        this.showToast('Évaluation ajoutée avec succès !', 'success');
-        this.loadEvaluations();
-      });
+      // Create a new evaluation
+      this.evaluationService.createEvaluation({ ...this.evaluation, scoreTotal })
+        .subscribe(() => {
+          this.showToast('Évaluation ajoutée avec succès !', 'success'); // Show success message
+          this.loadEvaluations(); // Reload evaluations list
+        }, () => {
+          this.showToast('Erreur lors de l\'ajout de l\'évaluation', 'error'); // Show error message
+        });
     }
-    this.resetForm();
+  
+    // Close the form after saving
     this.toggleForm();
   }
-
-  resetForm() {
-    this.evaluation = {
-      id: 0,
-      qualite: 'Bien',
-      delai: 'Bien',
-      cooperation: 'Bien',
-      commentaire: '',
-      scoreTotal: 0
-    };
-    this.editMode = false;
-  }
-
-  calculateScore(evaluation: Evaluation): number {
-    const qualiteScore = this.scores[evaluation.qualite];
-    const delaiScore = this.scores[evaluation.delai];
-    const cooperationScore = this.scores[evaluation.cooperation];
-    return (qualiteScore + delaiScore + cooperationScore) / 3;
-  }
-
+  
   editEvaluation(id: number) {
-    this.evaluationService.getEvaluationById(id).subscribe(evaluation => {
-      this.evaluation = { ...evaluation };
+    const evaluationToEdit = this.evaluations.find(evaluation => evaluation.id === id);
+    if (evaluationToEdit) {
+      this.evaluation = { ...evaluationToEdit };
+      this.showForm = true;
       this.editMode = true;
-      this.toggleForm();
-    });
+    }
   }
 
   confirmDelete(id: number) {
@@ -155,11 +181,46 @@ export class EvaluationComponent implements OnInit {
     });
     this.toggleDeleteConfirm();
   }
-  
 
-  goToPage(page: number) {
-    this.currentPage = page;
-    this.filteredEvaluations = this.paginate(this.evaluations);
+  calculateScore(evaluation: Evaluation): number {
+    let total = 0;
+    for (const critere of this.criteres) {
+      const score = this.scores[evaluation[critere] as keyof typeof evaluation];
+      if (score !== undefined) {
+        total += score;
+      }
+    }
+    return total / this.criteres.length;
+  }
+
+  resetForm() {
+    this.evaluation = {
+      id: 0,
+      technicien: { 
+        id: 0,
+        matricule: '',
+        nom: '',
+        prenom: '',
+        dateRecrutement: '',
+        dateNaissance: '',
+        telephone: '',
+        email: '',
+        cin: '',
+        adresseRue: '',
+        adresseVille: '',
+        adresseRegion: '',
+        adresseCodePostal: '',
+        situationFamiliale: '',
+        fonction: ''
+      },
+      qualite: 'Bien',
+      delai: 'Bien',
+      cooperation: 'Bien',
+      formation:'Pas de formation',
+      commentaire: '',
+      scoreTotal: 0
+    };
+    this.currentTab = 'infos'; // Réinitialiser l'onglet à 'infos'
   }
 
   showToast(message: string, type: string) {
@@ -167,7 +228,13 @@ export class EvaluationComponent implements OnInit {
     this.toastType = type;
     setTimeout(() => {
       this.toastMessage = '';
-      this.toastType = '';
     }, 3000);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.filteredEvaluations = this.paginate(this.evaluations);
+    }
   }
 }

@@ -82,8 +82,31 @@ export class ProjetComponent implements OnInit {
       technicien.nom.toLowerCase().includes(query)
     );
   }
-  
 
+  cancelSelection(): void {
+    // Réinitialise les techniciens sélectionnés
+    this.techniciensSelectionnes = [];
+    
+    // Cache la liste des techniciens
+    this.showListTechniciens = false;
+    
+    // Réinitialiser la vue ou l'état si nécessaire
+    this.currentTab = 'details'; // Ou un autre état approprié
+  }
+  
+  
+  async someMethod() {
+    try {
+      // Utilisation de await pour attendre la fin de updateProjet
+      await this.updateProjet(this.idProjetAssign, this.projet);
+  
+      // Code à exécuter après la mise à jour du projet
+      console.log('Le projet a été mis à jour avec succès.');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du projet:', error);
+    }
+
+  }
   confirmerSelection(): void {
     
     if (this.techniciensSelectionnes.length === 0) {
@@ -96,7 +119,7 @@ export class ProjetComponent implements OnInit {
     this.projet.techniciens = Array.from(this.techniciensSelectionnes);
    
     // Mettre à jour le projet avec les techniciens sélectionnés
-    this.updateProjet(this.idProjetAssign, this.projet);
+    this.someMethod();
   
     // Réinitialiser les techniciens sélectionnés après l'assignation
     this.techniciensSelectionnes = [];

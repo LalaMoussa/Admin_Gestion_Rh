@@ -19,7 +19,6 @@ public class ProjetController {
 
     @GetMapping("/projets")
     public List<ProjetDto> getAllProjets() {
-        // Appelle la méthode findAll() du service, qui renvoie une liste de ProjetDto
         return projetService.findAll();
     }
 
@@ -38,17 +37,11 @@ public class ProjetController {
 
     @PutMapping("/projets/{id}")
     public ResponseEntity<ProjetDto> updateProjet(@PathVariable Long id, @RequestBody ProjetDto projetDto) {
-        // Ensure the DTO has the correct ID
-        projetDto.setId(id);
 
         try {
-            // Call the service to update the project
-            ProjetDto updatedProjetDto = projetService.updateProjet(projetDto);
-
-            // Return the updated project with status 200 OK
+            ProjetDto updatedProjetDto = projetService.updateProjet(id,projetDto);
             return ResponseEntity.ok(updatedProjetDto);
         } catch (RuntimeException e) {
-            // Handle the case where the project does not exist
             return ResponseEntity.notFound().build();
         }
     }
@@ -56,7 +49,7 @@ public class ProjetController {
     @DeleteMapping("/projets/{id}")
     public ResponseEntity<Void> deleteProjet(@PathVariable Long id) {
         if (projetService.findById(id).isPresent()) {
-            projetService.deleteById(id); // Supprime un projet par son ID
+            projetService.deleteById(id);
             return ResponseEntity.noContent().build(); // Retourne 204 pour une suppression réussie
         } else {
             return ResponseEntity.notFound().build(); // Retourne 404 si le projet n'existe pas

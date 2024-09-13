@@ -7,6 +7,7 @@ import { RapportComponent } from './rapport/rapport.component';
 import { EvaluationComponent } from './evaluation/evaluation.component';
 import { PointageComponent } from './pointage/pointage.component';
 import { CalendrierComponent } from './calendrier/calendrier.component';
+import { RapportpointageComponent } from './rapportpointage/rapportpointage.component';
 
 export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: 'pointage', component: PointageComponent },
   { path: 'rapport', component: RapportComponent },
   { path: 'calendrier', component: CalendrierComponent },
+  { path: 'rapportpointage', component: RapportpointageComponent },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // Redirection vers le dashboard par défaut
   { path: '**', redirectTo: '/dashboard', pathMatch: 'full' } // Redirection des routes non trouvées vers le dashboard
 ];
