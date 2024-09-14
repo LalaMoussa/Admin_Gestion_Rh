@@ -1,0 +1,72 @@
+<div class="rapport-container">
+  <header>
+    <h1>Liste des Rapports des Projets</h1>
+  </header>
+  
+  <!-- Barre de recherche -->
+  <div class="search-bar">
+    <input type="text" placeholder="Rechercher un projet..." [(ngModel)]="searchQuery" (input)="filterRapports()" />
+  </div>
+
+  <div class="rapport-list">
+    <ul>
+      <li *ngFor="let projet of filteredProjets">
+        <div class="rapport-summary">
+          <h3>{{ projet.nom }}</h3>
+          <p>Responsable : {{ projet.responsable }}</p>
+          <p>État : {{ projet.etat }}</p>
+          <button (click)="showDetails(projet)">
+            {{ selectedRapport === projet ? 'Cacher Détails' : 'Voir Détails' }}
+          </button>
+        </div>
+
+        <!-- Détails du rapport -->
+        <div *ngIf="selectedRapport === projet" class="rapport-details" [ngClass]="{'visible': selectedRapport === projet, 'hidden': selectedRapport !== projet}">
+          <header>
+            <img src="assets/logo.png" alt="Logo de l'entreprise" class="logo" />
+            <h1>Rapport de Projet</h1>
+          </header>
+
+          <section class="rapport-details-content">
+            <h2>Informations du Projet</h2>
+            <div class="details-grid">
+              <div><strong>Nom :</strong> {{ projet.nom }}</div>
+              <div><strong>Emplacement :</strong> {{ projet.emplacement }}</div>
+              <div><strong>Date de Début :</strong> {{ projet.dateDebut | date }}</div>
+              <div><strong>Date de Fin :</strong> {{ projet.dateFin | date }}</div>
+              <div><strong>Responsable :</strong> {{ projet.responsable }}</div>
+              <div><strong>État :</strong> {{ projet.etat }}</div>
+              <div><strong>Commentaire :</strong> {{ projet.commentaire }}</div>
+            </div>
+
+            <h3>Techniciens Assignés</h3>
+            <ul>
+              <li *ngFor="let tech of projet.techniciens">
+                <p><strong>Nom :</strong> {{ tech.nom }} {{ tech.prenom }}</p>
+                <p><strong>Matricule :</strong> {{ tech.matricule }}</p>
+                <p><strong>Téléphone :</strong> {{ tech.telephone }}</p>
+                <p><strong>Email :</strong> {{ tech.email }}</p>
+                <p><strong>Adresse :</strong> {{ tech.adresseRue }}, {{ tech.adresseVille }}, {{ tech.adresseRegion }} {{ tech.adresseCodePostal }}</p>
+                <p><strong>Date de Recrutement :</strong> {{ tech.dateRecrutement | date }}</p>
+                <p><strong>Date de Naissance :</strong> {{ tech.dateNaissance | date }}</p>
+                <p><strong>CIN :</strong> {{ tech.cin }}</p>
+              </li>
+            </ul>
+
+            <section class="rapport-content">
+              <h2>Contenu du Rapport</h2>
+              <p>{{ projet.contenuRapport }}</p>
+            </section>
+
+            <footer>
+              <p>Date de Création : {{projet.dateCreationRapport | date }}</p>
+              <p>État du Rapport : {{ projet.etat }}</p>
+              <button (click)="printReport(projet)" class="print">Imprimer</button>
+              <button (click)="notifyReport(projet)" class="notify">Envoyer Notification</button>
+            </footer>
+          </section>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

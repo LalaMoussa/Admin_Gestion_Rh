@@ -1,0 +1,173 @@
+/* Conteneur principal du rapport */
+.rapport-container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background-color: #ffffff; /* Fond blanc pour une apparence plus lumineuse */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* En-tête du rapport */
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeIn 1s ease-in;
+}
+
+.logo {
+    max-width: 150px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 10px;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Barre de recherche */
+.search-bar {
+    margin-bottom: 20px;
+    animation: fadeIn 1s ease-in;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Résumé du rapport */
+.rapport-summary {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Détails du rapport */
+.rapport-details {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9f9f9; /* Fond gris clair pour une meilleure lisibilité */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    margin-bottom: 20px; /* Ajouter de l'espace sous chaque rapport */
+    animation: fadeIn 1s ease-in;
+}
+
+/* Section visible du rapport */
+.rapport-details.hidden {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.rapport-details.visible {
+    max-height: 1000px; /* Ajuster selon le contenu */
+    opacity: 1;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Informations du projet */
+.rapport-details-content h2 {
+    font-size: 24px;
+    color: #007bff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Techniciens assignés */
+.rapport-details-content h3 {
+    font-size: 20px;
+    color: #007bff;
+    margin-top: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Contenu du rapport */
+.rapport-content h2 {
+    font-size: 20px;
+    color: #007bff;
+    margin-top: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Texte des sections */
+p {
+    font-size: 16px;
+    color: #333; /* Couleur de texte plus foncée pour une meilleure lisibilité */
+    line-height: 1.6;
+    margin: 10px 0;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Pied de page */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Boutons */
+button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 5px; /* Espacement entre les boutons */
+    transition: background-color 0.3s ease;
+    animation: fadeIn 1s ease-in;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Bouton Imprimer */
+button.print {
+    background-color: #ffc107; /* Jaune */
+    color: #fff;
+}
+
+button.print:hover {
+    background-color: #e0a800; /* Jaune foncé au survol */
+}
+
+/* Bouton Envoyer Notification */
+button.notify {
+    background-color: #28a745; /* Vert */
+    color: #fff;
+}
+
+button.notify:hover {
+    background-color: #218838; /* Vert foncé au survol */
+}

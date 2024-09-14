@@ -1,0 +1,18 @@
+<div class="calendar-container">
+  <h1>Calendrier des Projets</h1>
+  <full-calendar [options]="calendarOptions"></full-calendar>
+</div>
+
+<div class="project-details" *ngIf="projetDetail">
+  <div class="details-card">
+    <h2>Détails du Projet : {{ projetDetail.nom }}</h2>
+    <div class="project-info">
+      <div><strong>Responsable :</strong> {{ projetDetail.responsable }}</div>
+      <div><strong>Date de Début :</strong> {{ projetDetail.dateDebut | date: 'dd/MM/yyyy' }}</div>
+      <div><strong>Date de Fin :</strong> {{ projetDetail.dateFin | date: 'dd/MM/yyyy' }}</div>
+      <div><strong>État :</strong> {{ projetDetail.etat }}</div>
+      <div><strong>Commentaires :</strong> {{ projetDetail.commentaire }}</div>
+    </div>
+    <button class="close-details" (click)="closeDetails()">Fermer</button>
+  </div>
+</div>
