@@ -12,6 +12,7 @@ export class RapportComponent implements OnInit {
   filteredProjets: Projet[] = [];
   searchQuery: string = '';
   selectedRapport: Projet | null = null;
+  idTechnicien: number = 0; // Assure-toi que cet ID est mis à jour correctement
 
   constructor(private projetService: ProjetService) {}
 
@@ -19,15 +20,46 @@ export class RapportComponent implements OnInit {
     this.getProjets();
   }
 
-  getProjets(): void {
-    this.projetService.getProjets().subscribe(
-      (data: Projet[]) => {
-        console.log('Données récupérées:', data); // Vérifiez les données dans la console
-        this.projets = data;
-        this.filterRapports();
+ getProjets(): void {
+  this.projetService.getProjets().subscribe(
+    (data: Projet[]) => {
+      console.log('Données récupérées:', data); // Vérifie les données dans la console
+      
+      // Filtrer les projets qui ont des techniciens non nuls
+      this.projets = data.filter(projet => projet.techniciens && projet.techniciens.length > 0);
+      
+      this.filterRapports(); // Appliquer le filtre si nécessaire
+    },
+    (error) => {
+      console.error('Erreur lors de la récupération des projets', error);
+    }
+  );
+}
+
+  
+  removeTechnicien(idTechnicien: number, idProjet: number): void {
+    // Étape 1: Récupérer le projet par son ID
+    this.projetService.getProjetById(idProjet).subscribe(
+      (projet: Projet) => {
+        if (projet) {
+          // Étape 2: Supprimer le technicien de la liste des techniciens du projet
+          projet.techniciens = projet.techniciens?.filter(tech => tech.id !== idTechnicien);
+
+          // Étape 3: Mettre à jour le projet avec la liste des techniciens modifiée
+          this.projetService.removeTechProjet(projet.id,projet).subscribe(
+            () => {
+              console.log('Technicien supprimé et projet mis à jour');
+              // Optionnel: Mettre à jour la liste des projets affichée
+              this.getProjets();
+            },
+            (error) => {
+              console.error('Erreur lors de la mise à jour du projet', error);
+            }
+          );
+        }
       },
       (error) => {
-        console.error('Erreur lors de la récupération des projets', error);
+        console.error('Erreur lors de la récupération du projet', error);
       }
     );
   }
@@ -81,7 +113,6 @@ export class RapportComponent implements OnInit {
                     <li>
                       <p><strong>Nom :</strong> ${tech.nom} ${tech.prenom}</p>
                       <p><strong>Matricule :</strong> ${tech.matricule}</p>
-                     
                     </li>
                   `).join('') : '<li>Aucun technicien assigné</li>'}
                 </ul>

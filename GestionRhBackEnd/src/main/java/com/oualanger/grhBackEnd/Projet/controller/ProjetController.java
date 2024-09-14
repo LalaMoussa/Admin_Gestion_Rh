@@ -37,9 +37,8 @@ public class ProjetController {
 
     @PutMapping("/projets/{id}")
     public ResponseEntity<ProjetDto> updateProjet(@PathVariable Long id, @RequestBody ProjetDto projetDto) {
-
         try {
-            ProjetDto updatedProjetDto = projetService.updateProjet(id,projetDto);
+            ProjetDto updatedProjetDto = projetService.updateProjet(id, projetDto);
             return ResponseEntity.ok(updatedProjetDto);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -53,6 +52,16 @@ public class ProjetController {
             return ResponseEntity.noContent().build(); // Retourne 204 pour une suppression réussie
         } else {
             return ResponseEntity.notFound().build(); // Retourne 404 si le projet n'existe pas
+        }
+    }
+
+    @PutMapping("/projets/tech/{id}")
+    public ResponseEntity<ProjetDto> removeTechProjet(@PathVariable Long id, @RequestBody ProjetDto projetDto) {
+        try {
+            ProjetDto updatedProjetDto = projetService.removeTechProjet(id, projetDto);
+            return ResponseEntity.ok(updatedProjetDto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

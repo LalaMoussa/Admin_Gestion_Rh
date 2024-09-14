@@ -88,6 +88,34 @@ public class ProjetService {
         // Sauvegarde et retourne le projet mis à jour
         return projetMapper.toDTO(projetRepository.save(existingProjet));
     }
+    public ProjetDto removeTechProjet(Long idProjet, ProjetDto projetDto) {
+        // Récupère le projet existant par ID
+        Projet existingProjet = projetRepository.findById(idProjet)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // Met à jour les champs du projet (sauf techniciens)
+        existingProjet.setNom(projetDto.getNom());
+        existingProjet.setEmplacement(projetDto.getEmplacement());
+        existingProjet.setDateDebut(projetDto.getDateDebut());
+        existingProjet.setDateFin(projetDto.getDateFin());
+        existingProjet.setResponsable(projetDto.getResponsable());
+        existingProjet.setEtat(projetDto.getEtat());
+        existingProjet.setCommentaire(projetDto.getCommentaire());
+
+        // Remplace la liste des techniciens existants par la nouvelle liste
+        List<Technicien> newTechniciens = technicienMapper.toModels(projetDto.getTechniciens());
+        existingProjet.setTechniciens(newTechniciens);
+
+        // Gérer les évaluations (remplacer l'ancienne liste par la nouvelle)
+        existingProjet.getEvaluations().clear();
+        for (EvaluationDto evalDto : projetDto.getEvaluations()) {
+            Evaluation evaluation = evaluationMapper.toModel(evalDto); // Convertit EvaluationDto en Evaluation
+            existingProjet.addEvaluation(evaluation);
+        }
+
+        // Sauvegarde et retourne le projet mis à jour
+        return projetMapper.toDTO(projetRepository.save(existingProjet));
+    }
 
 
     // Supprime un projet par son ID

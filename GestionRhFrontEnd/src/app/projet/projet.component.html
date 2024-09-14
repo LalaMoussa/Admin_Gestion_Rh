@@ -49,7 +49,7 @@
                     <div class="techniciens-container">
                         <div *ngFor="let technicien of filterTechniciens()" class="technicien-item">
                             <div class="technicien-details">
-                                <h3>{{ technicien.nom }}</h3>
+                                <h3>{{ technicien.nom }} {{ technicien.prenom }}</h3>
                                 <p>Matricule: {{ technicien.matricule }}</p>
                                 <input
                                     type="checkbox"

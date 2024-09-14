@@ -77,11 +77,20 @@ export class ProjetComponent implements OnInit {
 
   // Méthodes pour gérer la liste des techniciens
   filterTechniciens(): Technicien[] {
-    const query = this.searchQuery.toLowerCase();
-    return this.techniciens.filter(technicien =>
-      technicien.nom.toLowerCase().includes(query)
-    );
+    const query = this.searchQuery?.toLowerCase() || '';
+  
+    // Vérifier si le projet et la liste des techniciens associés au projet existent
+    const techniciensAssociesIds = this.projet?.techniciens?.map(t => t.id) || [];
+  
+    return this.techniciens.filter(technicien => {
+      const technicienId = technicien.id;
+  
+      // Filtrer les techniciens dont l'ID ne figure pas dans la liste des techniciens associés au projet
+      return !techniciensAssociesIds.includes(technicienId) &&
+        (technicien.nom?.toLowerCase().includes(query) || technicien.prenom?.toLowerCase().includes(query));
+    });
   }
+  
 
   cancelSelection(): void {
     // Réinitialise les techniciens sélectionnés

@@ -189,3 +189,18 @@ button.notify:hover {
         transform: translateY(0);
     }
 }
+
+
+/* Style pour ajuster les marges */
+.me-3 {
+    margin-right: 1.5rem;
+  }
+  
+  .text-primary {
+    color: #007bff;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+  }
+  
