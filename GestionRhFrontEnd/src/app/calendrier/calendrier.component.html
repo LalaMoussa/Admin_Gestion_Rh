@@ -4,6 +4,7 @@
     <h1>Calendrier des projets</h1>
   </div>
 
+  <!-- En-tête du calendrier -->
   <div class="calendar-header">
     <h2>{{ mois | titlecase }} {{ annee }}</h2>
     <div class="calendar-controls">
@@ -12,12 +13,14 @@
     </div>
   </div>
 
+  <!-- En-tête des jours du calendrier -->
   <div class="gantt-header">
     <div *ngFor="let jour of joursDuMois" class="gantt-day">{{ jour }}</div>
   </div>
 
+  <!-- Contenu du calendrier avec les barres de projets -->
   <div class="gantt-content">
-    <div *ngFor="let projet of projets" class="gantt-row">
+    <div *ngFor="let projet of projetsAffiches" class="gantt-row">
       <div 
         class="gantt-bar" 
         [ngStyle]="{

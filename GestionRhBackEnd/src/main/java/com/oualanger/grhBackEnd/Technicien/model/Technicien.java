@@ -1,6 +1,7 @@
 package com.oualanger.grhBackEnd.Technicien.model;
 
 import com.oualanger.grhBackEnd.Evaluation.Model.Evaluation;
+import com.oualanger.grhBackEnd.Pointage.Model.Pointage;
 import com.oualanger.grhBackEnd.Projet.model.Projet;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,4 +48,7 @@ public class Technicien {
 
     @OneToMany(mappedBy = "technicien")
     private List<Evaluation> evaluations;
+
+    @OneToMany(mappedBy = "technicien")
+    private List<Pointage> pointages;
 }

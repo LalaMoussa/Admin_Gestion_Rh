@@ -1,5 +1,6 @@
 package com.oualanger.grhBackEnd.Pointage.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.oualanger.grhBackEnd.Technicien.model.Technicien;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,9 @@ public class Pointage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "technicien_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "technicien_id", referencedColumnName = "id")
+    @JsonIgnoreProperties("pointages")
     private Technicien technicien;
 
     private LocalDate date;
@@ -33,4 +35,12 @@ public class Pointage {
 
     @Column(name = "commentaire")
     private String commentaire;
+
+    @Column(name = "heureSup")
+    private int heureSup;
+
+    // Ajoutez une méthode pour obtenir le nom du technicien si nécessaire
+    public String getNomTechnicien() {
+        return technicien != null ? technicien.getNom() : null; // Assurez-vous que `Technicien` a une méthode `getNom()`
+    }
 }
