@@ -1,4 +1,3 @@
-// pointage.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,7 +7,7 @@ import { Pointage } from '../models/pointage.model';
   providedIn: 'root'
 })
 export class PointageService {
-  private apiUrl = 'http://localhost:8080/api'; // Assurez-vous que l'URL est correcte
+  private apiUrl = 'http://localhost:8080/api';  // Assurez-vous que cette URL est correcte
 
   constructor(private http: HttpClient) { }
 

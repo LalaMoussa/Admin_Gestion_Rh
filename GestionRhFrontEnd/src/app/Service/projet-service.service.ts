@@ -47,12 +47,6 @@ export class ProjetService {
     const url = `${this.baseUrl}/techniciens`; // URL pour obtenir les techniciens
     return this.http.get<Technicien[]>(url);
   }
-  // Méthode pour obtenir les techniciens assignés à un projet
-  getTechniciensFromProjet(projetId: number): Observable<Technicien[]> {
-    const url = `${this.baseUrl}/projets/${projetId}/techniciens`; // URL pour obtenir les techniciens d'un projet
-    return this.http.get<Technicien[]>(url);
-  }
-
 
   // Méthode pour retirer des techniciens d'un projet
   removeTechProjet(id: number, projet: Projet): Observable<Projet> {

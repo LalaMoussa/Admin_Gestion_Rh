@@ -1,7 +1,11 @@
 package com.oualanger.grhBackEnd.Technicien.Dto;
 
+import com.oualanger.grhBackEnd.Pointage.Model.Pointage;
 import com.oualanger.grhBackEnd.Technicien.model.Technicien;
 import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class TechnicienDto {
@@ -10,8 +14,8 @@ public class TechnicienDto {
     private String matricule;
     private String nom;
     private String prenom;
-    private String dateRecrutement;
-    private String dateNaissance;
+    private LocalDate dateRecrutement;
+    private LocalDate dateNaissance;
     private String telephone;
     private String email;
     private String cin;
@@ -20,6 +24,7 @@ public class TechnicienDto {
     private String adresseVille;
     private String adresseRegion;
     private String adresseCodePostal;
+    private List<Pointage> pointage; // Liste des techniciens sous forme de DTO
 
     private String situationFamiliale;
     private String fonction;
@@ -33,8 +38,8 @@ public class TechnicienDto {
         mappedTechnicienRequest.setMatricule(technicien.getMatricule());
         mappedTechnicienRequest.setNom(technicien.getNom());
         mappedTechnicienRequest.setPrenom(technicien.getPrenom());
-        mappedTechnicienRequest.setDateRecrutement(technicien.getDateRecrutement().toString()); // Conversion LocalDate en String
-        mappedTechnicienRequest.setDateNaissance(technicien.getDateNaissance().toString()); // Conversion LocalDate en String
+        mappedTechnicienRequest.setDateRecrutement(technicien.getDateRecrutement()); // Conversion LocalDate en String
+        mappedTechnicienRequest.setDateNaissance(technicien.getDateNaissance()); // Conversion LocalDate en String
         mappedTechnicienRequest.setTelephone(technicien.getTelephone());
         mappedTechnicienRequest.setEmail(technicien.getEmail());
         mappedTechnicienRequest.setCin(technicien.getCin());

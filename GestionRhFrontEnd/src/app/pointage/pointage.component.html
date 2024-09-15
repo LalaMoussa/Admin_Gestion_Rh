@@ -30,7 +30,7 @@
                             [items]="techniciens"
                             bindLabel="nom"
                             bindValue="id"
-                            [(ngModel)]="pointage.technicien"
+                            [(ngModel)]="pointage.technicienId"
                             name="technicien"
                             placeholder="Sélectionner un technicien"
                             [searchable]="true"
@@ -56,6 +56,10 @@
                     <div class="form-group">
                         <label for="heureFin">Heure de Fin:</label>
                         <input id="heureFin" type="time" [(ngModel)]="pointage.heureFin" name="heureFin" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="heureSupplementaire">Heures Supplémentaires:</label>
+                        <input id="heureSupplementaire" type="number" [(ngModel)]="pointage.heuresSupplementaires" name="heureSupplementaire" placeholder="Entrez les heures supplémentaires" />
                     </div>
                 </form>
             </div>
@@ -99,7 +103,7 @@
                     <td>{{ pointage.heureDebut }}</td>
                     <td>{{ pointage.heureFin }}</td>
                     <td>{{ calculateHoursWorked(pointage) | number:'1.2-2' }}</td>
-                    <td>{{ calculateOvertimeHours(pointage) | number:'1.2-2' }}</td>
+                    <td>{{ pointage.heuresSupplementaires }}</td>
                     <td>
                         <button (click)="editPointage(pointage.id)">Éditer</button>
                         <button (click)="confirmDelete(pointage.id)">Supprimer</button>

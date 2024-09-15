@@ -1,5 +1,7 @@
 package com.oualanger.grhBackEnd;
 
+import com.oualanger.grhBackEnd.Pointage.Model.Pointage;
+import com.oualanger.grhBackEnd.Pointage.Repository.PointageRepository;
 import com.oualanger.grhBackEnd.Technicien.model.Technicien;
 import com.oualanger.grhBackEnd.Projet.model.Projet;
 import com.oualanger.grhBackEnd.Technicien.repository.TechnicienRepository;
@@ -10,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -20,7 +23,7 @@ public class grhBackEndApp {
 	}
 
 	@Bean
-	public CommandLineRunner demo(TechnicienRepository technicienRepository, ProjetRepository projetRepository) {
+	public CommandLineRunner demo(TechnicienRepository technicienRepository, ProjetRepository projetRepository, PointageRepository pointageRepository) {
 		return (args) -> {
 			// Create and save Technicien entities
 			Technicien technicien2 = new Technicien();
@@ -93,6 +96,23 @@ public class grhBackEndApp {
 			technicienRepository.save(technicien4);
 			technicienRepository.save(technicien5);
 
+			// Create and save Pointage entities
+			Pointage pointage1 = new Pointage();
+			pointage1.setDate(LocalDate.of(2024, 9, 10));
+			pointage1.setHeureDebut(LocalTime.of(8, 0)); // 08:00 AM
+			pointage1.setHeureFin(LocalTime.of(16, 0));  // 04:00 PM
+			pointage1.setHeureSup(1); // 1 hour of overtime
+			pointage1.setCommentaire("Worked on Project A");
+
+			Pointage pointage2 = new Pointage();
+			pointage2.setDate(LocalDate.of(2024, 9, 11));
+			pointage2.setHeureDebut(LocalTime.of(9, 0)); // 09:00 AM
+			pointage2.setHeureFin(LocalTime.of(17, 0));  // 05:00 PM
+			pointage2.setHeureSup(0); // No overtime
+			pointage2.setCommentaire("Worked on Project B");
+			// Assigning multiple techniciens
+
+
 			// Create and save Projet entities
 			Projet projet1 = new Projet();
 			projet1.setNom("Project A");
@@ -120,6 +140,11 @@ public class grhBackEndApp {
 			projet3.setResponsable("Charlie");
 			projet3.setEtat("En cours");
 			projet3.setCommentaire("Project C details");
+
+			// Save pointages
+			pointageRepository.save(pointage1);
+			pointageRepository.save(pointage2);
+
 
 			projetRepository.save(projet1);
 			projetRepository.save(projet2);

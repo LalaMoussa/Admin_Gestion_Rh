@@ -16,13 +16,13 @@ public class PointageController {
     @Autowired
     private PointageService pointageService;
 
-    @PostMapping
+    @PostMapping("/pointages")
     public ResponseEntity<PointageDto> createPointage(@RequestBody PointageDto pointageDTO) {
         PointageDto createdPointage = pointageService.createPointage(pointageDTO);
         return ResponseEntity.ok(createdPointage);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/pointages/{id}")
     public ResponseEntity<PointageDto> getPointageById(@PathVariable Long id) {
         PointageDto pointageDTO = pointageService.getPointageById(id);
         if (pointageDTO != null) {
@@ -32,7 +32,7 @@ public class PointageController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/pointages/{id}")
     public ResponseEntity<PointageDto> updatePointage(@PathVariable Long id, @RequestBody PointageDto pointageDTO) {
         PointageDto updatedPointage = pointageService.updatePointage(id, pointageDTO);
         if (updatedPointage != null) {
@@ -42,7 +42,7 @@ public class PointageController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/pointages/{id}")
     public ResponseEntity<Void> deletePointage(@PathVariable Long id) {
         boolean isDeleted = pointageService.deletePointage(id);
         if (isDeleted) {
@@ -52,7 +52,7 @@ public class PointageController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/pointages")
     public ResponseEntity<List<PointageDto>> getAllPointages() {
         List<PointageDto> pointages = pointageService.getAllPointages();
         return ResponseEntity.ok(pointages);

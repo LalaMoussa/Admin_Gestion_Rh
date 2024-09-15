@@ -49,6 +49,10 @@ public class Technicien {
     @OneToMany(mappedBy = "technicien")
     private List<Evaluation> evaluations;
 
-    @OneToMany(mappedBy = "technicien")
+    @ManyToMany
+    @JoinTable(
+            name = "pointage_technicien",
+            joinColumns = @JoinColumn(name = "pointage_id"),
+            inverseJoinColumns = @JoinColumn(name = "technicien_id"))
     private List<Pointage> pointages;
 }

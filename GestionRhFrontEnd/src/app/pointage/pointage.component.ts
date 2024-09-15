@@ -23,11 +23,12 @@ export class PointageComponent implements OnInit {
   toastType: string | null = null;
   pointage: Pointage = {
     id: 0,
-    technicien: null,
+    technicienId: undefined,
     date: '',
     heureDebut: '',
     heureFin: '',
-    commentaire: ''
+    commentaire: '',
+    heuresSupplementaires: 0
   };
   techniciens: Technicien[] = [];
   searchTechnicien: string = '';
@@ -38,30 +39,39 @@ export class PointageComponent implements OnInit {
     private technicienService: TechnicienService
   ) { }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.loadPointages();
     this.loadTechniciens();
   }
 
+  // Charge les pointages depuis le service
   loadPointages(): void {
-    this.pointageService.getPointages().subscribe((data: Pointage[]) => {
-      this.pointages = data;
-      this.filteredPointages = data;
-      this.updatePagination();
-    }, error => {
-      console.error('Erreur lors du chargement des pointages:', error);
+    this.pointageService.getPointages().subscribe({
+      next: (data: Pointage[]) => {
+        this.pointages = data;
+        this.filteredPointages = data;
+        this.updatePagination();
+      },
+      error: error => {
+        console.error('Erreur lors du chargement des pointages:', error);
+      }
     });
   }
 
+  // Charge les techniciens depuis le service
   loadTechniciens(): void {
-    this.technicienService.getTechniciens().subscribe((data: Technicien[]) => {
-      this.techniciens = data;
-      this.filteredTechniciens = data;
-    }, error => {
-      console.error('Erreur lors du chargement des techniciens:', error);
+    this.technicienService.getTechniciens().subscribe({
+      next: (data: Technicien[]) => {
+        this.techniciens = data;
+        this.filteredTechniciens = data;
+      },
+      error: error => {
+        console.error('Erreur lors du chargement des techniciens:', error);
+      }
     });
   }
 
+  // Affiche ou cache le formulaire de pointage
   toggleForm(): void {
     this.showForm = !this.showForm;
     if (!this.showForm) {
@@ -69,62 +79,81 @@ export class PointageComponent implements OnInit {
     }
   }
 
+  // Réinitialise les données du formulaire de pointage
   resetPointageForm(): void {
     this.pointage = {
       id: 0,
-      technicien: null,
+      technicienId: undefined,
       date: '',
       heureDebut: '',
       heureFin: '',
-      commentaire: ''
+      commentaire: '',
+      heuresSupplementaires: 0
     };
   }
 
+  // Change l'onglet affiché
   changeTab(tabName: string): void {
     this.currentTab = tabName;
   }
 
+  // Soumet le formulaire de pointage
   onSubmit(): void {
+    this.pointage.heuresSupplementaires = this.calculateHoursWorked(this.pointage) - 8;
     if (this.pointage.id !== 0) {
-      this.pointageService.updatePointage(this.pointage.id, this.pointage).subscribe(() => {
-        this.showToast('Pointage mis à jour avec succès', 'success');
-        this.loadPointages();
-        this.toggleForm();
-      }, error => {
-        console.error('Erreur lors de la mise à jour du pointage:', error);
+      this.pointageService.updatePointage(this.pointage.id, this.pointage).subscribe({
+        next: () => {
+          this.showToast('Pointage mis à jour avec succès', 'success');
+          this.loadPointages();
+          this.toggleForm();
+        },
+        error: error => {
+          console.error('Erreur lors de la mise à jour du pointage:', error);
+        }
       });
     } else {
-      this.pointageService.createPointage(this.pointage).subscribe(() => {
-        this.showToast('Pointage ajouté avec succès', 'success');
-        this.loadPointages();
-        this.toggleForm();
-      }, error => {
-        console.error('Erreur lors de l\'ajout du pointage:', error);
+      this.pointageService.createPointage(this.pointage).subscribe({
+        next: () => {
+          this.showToast('Pointage ajouté avec succès', 'success');
+          this.loadPointages();
+          this.toggleForm();
+        },
+        error: error => {
+          console.error('Erreur lors de l\'ajout du pointage:', error);
+        }
       });
     }
   }
 
+  // Charge les détails du pointage pour modification
   editPointage(id: number): void {
-    this.pointageService.getPointage(id).subscribe((data: Pointage) => {
-      this.pointage = data;
-      this.showForm = true;
-    }, error => {
-      console.error('Erreur lors de la récupération du pointage:', error);
+    this.pointageService.getPointage(id).subscribe({
+      next: (data: Pointage) => {
+        this.pointage = data;
+        this.showForm = true;
+      },
+      error: error => {
+        console.error('Erreur lors de la récupération du pointage:', error);
+      }
     });
   }
-  
 
+  // Confirme la suppression d'un pointage
   confirmDelete(id: number): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce pointage ?')) {
-      this.pointageService.deletePointage(id).subscribe(() => {
-        this.showToast('Pointage supprimé avec succès', 'success');
-        this.loadPointages();
-      }, error => {
-        console.error('Erreur lors de la suppression du pointage:', error);
+      this.pointageService.deletePointage(id).subscribe({
+        next: () => {
+          this.showToast('Pointage supprimé avec succès', 'success');
+          this.loadPointages();
+        },
+        error: error => {
+          console.error('Erreur lors de la suppression du pointage:', error);
+        }
       });
     }
   }
 
+  // Calcule les heures travaillées
   calculateHoursWorked(pointage: Pointage): number {
     const start = new Date(`1970-01-01T${pointage.heureDebut}`);
     const end = new Date(`1970-01-01T${pointage.heureFin}`);
@@ -132,11 +161,7 @@ export class PointageComponent implements OnInit {
     return diff;
   }
 
-  calculateOvertimeHours(pointage: Pointage): number {
-    const hoursWorked = this.calculateHoursWorked(pointage);
-    return Math.max(0, hoursWorked - 8);
-  }
-
+  // Affiche un message toast
   showToast(message: string, type: string): void {
     this.toastMessage = message;
     this.toastType = type;
@@ -146,6 +171,7 @@ export class PointageComponent implements OnInit {
     }, 3000);
   }
 
+  // Filtre les pointages selon la recherche
   filterPointages(): void {
     if (this.searchQuery.trim() === '') {
       this.filteredPointages = this.pointages;
@@ -157,11 +183,13 @@ export class PointageComponent implements OnInit {
     this.updatePagination();
   }
 
+  // Met à jour les données pour la pagination
   updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredPointages.length / this.itemsPerPage);
     this.pagedPointages = this.filteredPointages.slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage);
   }
 
+  // Change de page dans la pagination
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
@@ -169,6 +197,7 @@ export class PointageComponent implements OnInit {
     }
   }
 
+  // Filtre les techniciens selon la recherche
   filterTechniciens(): void {
     if (this.searchTechnicien.trim() === '') {
       this.filteredTechniciens = this.techniciens;
@@ -179,6 +208,7 @@ export class PointageComponent implements OnInit {
     }
   }
 
+  // Récupère le nom du technicien basé sur son ID
   getTechnicienName(technicienId: number | null | undefined): string {
     if (technicienId === undefined || technicienId === null) {
         return 'Technicien non attribué';
